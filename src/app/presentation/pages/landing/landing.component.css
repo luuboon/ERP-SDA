@@ -1,0 +1,92 @@
+    .landing-container {
+        min-height: 100vh;
+        background: #f8fafc;
+        color: #1e293b;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-right: 2rem;
+        color: #111827;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6rem 10% 4rem;
+        min-height: calc(85vh - 80px);
+        gap: 2rem;
+        background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    }
+
+    .hero-content {
+        flex: 1;
+        max-width: 600px;
+    }
+
+    .hero-content h1 {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        line-height: 1.1;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -1px;
+    }
+
+    .hero-content .highlight {
+        color: #475569;
+    }
+
+    .hero-content p {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+    }
+
+    .cta-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .hero-visual {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .glass-card h3 {
+        font-size: 1.5rem;
+        margin: 1.5rem 0 0.5rem;
+        color: #1e293b;
+    }
+
+    .glass-card p {
+        color: #64748b;
+        margin: 0;
+    }

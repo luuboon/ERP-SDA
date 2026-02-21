@@ -1,0 +1,40 @@
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-header h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    :host ::ng-deep .grayscale-input {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #1e293b;
+        padding: 1.5rem 0.75rem 0.5rem 0.75rem;
+        /* Ajuste para IftaLabel */
+    }
+
+    :host ::ng-deep .grayscale-password input {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #1e293b;
+    }
+
+    :host ::ng-deep .grayscale-password {
+        width: 100%;
+    }
+
+    :host ::ng-deep .p-password {
+        width: 100%;
+    }

@@ -1,0 +1,27 @@
+    :host ::ng-deep .grayscale-input {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #1e293b;
+        border-radius: 6px;
+    }
+
+    :host ::ng-deep .grayscale-password input {
+        width: 100%;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #1e293b;
+        padding: 0.75rem;
+        border-radius: 6px;
+    }
+
+    :host ::ng-deep .grayscale-password {
+        width: 100%;
+    }
+
+    :host ::ng-deep .p-password {
+        width: 100%;
+    }
+
+    :host ::ng-deep .p-select-label {
+        color: #1e293b;
+    }

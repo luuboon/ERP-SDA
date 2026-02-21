@@ -118,7 +118,7 @@ import { SelectItemGroup } from 'primeng/api';
                             
                             <div class="text-center mt-6 text-sm">
                                 <span class="text-slate-500">¿Ya tienes una cuenta? </span>
-                                <a routerLink="/auth/login" class="text-slate-900 font-bold hover:underline">Inicia Sesión</a>
+                                <a routerLink="/auth/login" class="text-slate-900 font-bold hover-underline">Inicia Sesión</a>
                             </div>
                         </form>
                     </ng-template>
@@ -184,90 +184,7 @@ import { SelectItemGroup } from 'primeng/api';
         </p-stepper>
     </div>
   `,
-    styles: [`
-    :host ::ng-deep .grayscale-input {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #1e293b;
-      border-radius: 6px;
-    }
-    :host ::ng-deep .grayscale-password input {
-      width: 100%;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #1e293b;
-      padding: 0.75rem;
-      border-radius: 6px;
-    }
-    :host ::ng-deep .grayscale-password {
-      width: 100%;
-    }
-    :host ::ng-deep .p-password {
-      width: 100%;
-    }
-    :host ::ng-deep .p-select-label {
-        color: #1e293b;
-    }
-
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .flex-row { flex-direction: row; }
-    .flex-auto { flex: 1 1 auto; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .justify-between { justify-content: space-between; }
-    .justify-end { justify-content: flex-end; }
-    .w-full { width: 100%; }
-    .h-full { height: 100%; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mt-4 { margin-top: 1rem; }
-    .mt-6 { margin-top: 1.5rem; }
-    .pt-4 { padding-top: 1rem; }
-    .pt-6 { padding-top: 1.5rem; }
-    .pt-8 { padding-top: 2rem; }
-    .p-3 { padding: 0.75rem; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-5 { gap: 1.25rem; }
-    .text-center { text-align: center; }
-    .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .font-bold { font-weight: 700; }
-    .font-semibold { font-weight: 600; }
-    .font-medium { font-weight: 500; }
-    .text-slate-900 { color: #0f172a; }
-    .text-slate-800 { color: #1e293b; }
-    .text-slate-700 { color: #334155; }
-    .text-slate-500 { color: #64748b; }
-    .text-slate-400 { color: #94a3b8; }
-    .text-white { color: #ffffff; }
-    .bg-transparent { background-color: transparent; }
-    .bg-slate-900 { background-color: #0f172a; }
-    .border-0 { border-width: 0; }
-    .border-2 { border-width: 2px; }
-    .border-b { border-bottom-width: 1px; border-bottom-style: solid; }
-    .border-slate-900 { border-color: #0f172a; border-style: solid; }
-    .border-slate-300 { border-color: #cbd5e1; border-style: solid; }
-    .rounded-full { border-radius: 9999px; }
-    .w-12 { width: 3rem; }
-    .h-12 { height: 3rem; }
-    .w-20 { width: 5rem; }
-    .h-20 { height: 5rem; }
-    .inline-flex { display: inline-flex; }
-    .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .cursor-pointer { cursor: pointer; }
-    .uppercase { text-transform: uppercase; }
-    .tracking-wider { letter-spacing: 0.05em; }
-    .pb-1 { padding-bottom: 0.25rem; }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-    .leading-relaxed { line-height: 1.625; }
-    .hover\\:underline:hover { text-decoration: underline; }
-  `]
+    styleUrl: './register.component.css'
 })
 export class RegisterComponent {
     private fb = inject(FormBuilder);

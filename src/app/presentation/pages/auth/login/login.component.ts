@@ -44,58 +44,11 @@ import { IftaLabelModule } from 'primeng/iftalabel';
       <p-button label="Iniciar Sesión" type="submit" severity="contrast" [disabled]="loginForm.invalid" styleClass="w-full login-btn"></p-button>
       
       <div class="auth-footer mt-4 text-center">
-        <p class="text-sm text-gray-500">¿No tienes una cuenta? <a routerLink="/auth/register" class="font-semibold text-gray-900 hover:underline">Regístrate</a></p>
+        <p class="text-sm text-gray-500">¿No tienes una cuenta? <a routerLink="/auth/register" class="font-semibold text-gray-900 hover-underline">Regístrate</a></p>
       </div>
     </form>
   `,
-  styles: [`
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .auth-header h2 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2rem;
-      color: #0f172a;
-      letter-spacing: -0.5px;
-    }
-    .auth-header p {
-      color: #64748b;
-      margin: 0;
-    }
-    :host ::ng-deep .grayscale-input {
-      width: 100%;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #1e293b;
-      padding: 1.5rem 0.75rem 0.5rem 0.75rem; 
-    }
-    :host ::ng-deep .grayscale-password input {
-      width: 100%;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      color: #1e293b;
-    }
-    :host ::ng-deep .grayscale-password {
-      width: 100%;
-    }
-    :host ::ng-deep .p-password {
-      width: 100%;
-    }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .gap-6 { gap: 1.5rem; }
-    .gap-2 { gap: 0.5rem; }
-    .items-center { align-items: center; }
-    .mt-4 { margin-top: 1rem; }
-    .text-center { text-align: center; }
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-gray-500 { color: #64748b; }
-    .text-gray-600 { color: #475569; }
-    .text-gray-900 { color: #0f172a; }
-    .font-semibold { font-weight: 600; }
-    .hover\\:underline:hover { text-decoration: underline; }
-  `]
+  styleUrl: './login.component.css'
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -110,7 +63,7 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       console.log('Login attempt:', this.loginForm.value);
-      this.router.navigate(['/']); 
+      this.router.navigate(['/']);
     }
   }
 }
