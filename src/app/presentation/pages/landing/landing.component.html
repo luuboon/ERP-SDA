@@ -1,0 +1,59 @@
+<div class="landing-container">
+    <p-toast />
+
+    <!-- Headless ConfirmDialog Demo -->
+    <p-confirmdialog #cd>
+        <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+            @if (message) {
+            <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
+                <div
+                    class="rounded-full bg-primary text-primary-contrast inline-flex justify-center items-center h-24 w-24 -mt-20">
+                    <i class="pi pi-question !text-5xl"></i>
+                </div>
+                <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
+                <p class="mb-0">{{ message.message }}</p>
+                <div class="flex items-center gap-2 mt-6">
+                    <p-button label="Aceptar" (onClick)="onAccept()" styleClass="w-32"></p-button>
+                    <p-button label="Cancelar" [outlined]="true" (onClick)="onReject()" styleClass="w-32"></p-button>
+                </div>
+            </div>
+            }
+        </ng-template>
+    </p-confirmdialog>
+
+    <!-- Navigation -->
+    <p-menubar [model]="items"
+        styleClass="border-none shadow-sm rounded-none sticky top-0 bg-white/80 backdrop-blur-md z-50">
+        <ng-template pTemplate="start">
+            <span class="logo">ERP-Luu</span>
+        </ng-template>
+        <ng-template pTemplate="end">
+            <div class="auth-buttons">
+                <p-button label="Iniciar Sesión" icon="pi pi-sign-in" routerLink="/auth/login"
+                    styleClass="p-button-text text-gray-700"></p-button>
+                <p-button label="Regístrate" icon="pi pi-user-plus" routerLink="/auth/register"
+                    severity="contrast"></p-button>
+            </div>
+        </ng-template>
+    </p-menubar>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Bienvenido a <span class="highlight">ERP-Luu</span></h1>
+            <p>La solución ERP premium con arquitectura limpia. Rápida, eficiente y elegante.</p>
+            <div class="cta-group">
+                <p-button label="Comenzar ahora" icon="pi pi-arrow-right" size="large" routerLink="/auth/register"
+                    severity="contrast"></p-button>
+                <p-button label="Evaluar Sistema" icon="pi pi-comment" size="large" severity="secondary"
+                    [outlined]="true" (onClick)="confirm()"></p-button>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="glass-card">
+                <i class="pi pi-objects-column" style="font-size: 4rem; color: #333;"></i>
+                <h3>Arquitectura Moderna</h3>
+                <p>Limpia, mantenible y veloz.</p>
+            </div>
+        </div>
+    </div>
+</div>
