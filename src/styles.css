@@ -1,6 +1,15 @@
 @import "primeicons/primeicons.css";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+  background-color: #f8fafc;
+}
 
 body {
   margin: 0;
-  font-family: var(--font-family, sans-serif);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

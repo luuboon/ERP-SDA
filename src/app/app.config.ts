@@ -7,7 +7,7 @@ import Lara from '@primeuix/themes/lara';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZonelessChangeDetection(), // <-- ¡Esta es la pieza clave que faltaba!
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),
     providePrimeNG({
