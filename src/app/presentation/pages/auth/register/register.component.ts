@@ -27,7 +27,8 @@ import { SelectItemGroup } from 'primeng/api';
         SelectModule,
         DatePickerModule,
         InputMaskModule,
-        CommonModule
+        CommonModule,
+        InputTextModule
     ],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css'
@@ -40,14 +41,21 @@ export class RegisterComponent {
 
     step1Form = this.fb.group({
         name: ['', Validators.required],
+        usuario: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8)]]
-    });
+        password: ['', [
+            Validators.required,
+            Validators.minLength(10),
+            Validators.pattern(/^(?=.*[!@#$%^&*(),.?":{}|<>]).*$/)
+        ]],
+        confirmPassword: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator });
 
     step2Form = this.fb.group({
+        address: ['', Validators.required],
         city: ['', Validators.required],
-        birthDate: [null, Validators.required],
-        phone: ['', Validators.required]
+        birthDate: [null as Date | null, [Validators.required, this.ageValidator]],
+        phone: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]]
     });
 
     groupedCities: SelectItemGroup[] = [
@@ -72,6 +80,23 @@ export class RegisterComponent {
             ]
         }
     ];
+
+    passwordMatchValidator(g: any) {
+        return g.get('password').value === g.get('confirmPassword').value
+            ? null : { 'mismatch': true };
+    }
+
+    ageValidator(control: any) {
+        if (!control.value) return null;
+        const birthDate = new Date(control.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 18 ? null : { 'underage': true };
+    }
 
     completeRegistration() {
         if (this.step1Form.valid && this.step2Form.valid) {

@@ -60,9 +60,9 @@
                         <div class="text-center mb-4 text-xl font-semibold text-slate-800">Información Básica</div>
 
                         <div class="field flex flex-col gap-2">
-                            <label for="name" class="font-medium text-slate-700">Nombre Completo</label>
-                            <input formControlName="name" pInputText id="name" type="text" placeholder="Ej. Juan Pérez"
-                                class="w-full grayscale-input p-3" />
+                            <label for="usuario" class="font-medium text-slate-700">Usuario</label>
+                            <input formControlName="usuario" pInputText id="usuario" type="text"
+                                placeholder="Ej. jperez123" class="w-full grayscale-input p-3" />
                         </div>
 
                         <div class="field flex flex-col gap-2">
@@ -74,8 +74,25 @@
                         <div class="field flex flex-col gap-2">
                             <label for="password" class="font-medium text-slate-700">Contraseña</label>
                             <p-password formControlName="password" styleClass="w-full grayscale-password"
-                                placeholder="Contraseña" [toggleMask]="true" [feedback]="false">
+                                placeholder="Contraseña (Mínimo 10 carácteres y símbolo especial)" [toggleMask]="true"
+                                [feedback]="false">
                             </p-password>
+                        </div>
+
+                        <div class="field flex flex-col gap-2">
+                            <label for="confirmPassword" class="font-medium text-slate-700">Confirmación de
+                                Contraseña</label>
+                            <p-password formControlName="confirmPassword" styleClass="w-full grayscale-password"
+                                placeholder="Confirma tu contraseña" [toggleMask]="true" [feedback]="false">
+                            </p-password>
+                            <small *ngIf="step1Form.hasError('mismatch') && step1Form.get('confirmPassword')?.touched"
+                                class="text-red-500">Las contraseñas no coinciden.</small>
+                        </div>
+
+                        <div class="field flex flex-col gap-2">
+                            <label for="name" class="font-medium text-slate-700">Nombre Completo</label>
+                            <input formControlName="name" pInputText id="name" type="text" placeholder="Ej. Juan Pérez"
+                                class="w-full grayscale-input p-3" />
                         </div>
 
                         <div class="flex pt-6 justify-end mt-4">
@@ -98,6 +115,12 @@
                         <div class="text-center mb-4 text-xl font-semibold text-slate-800">Ubicación y Detalles</div>
 
                         <div class="field flex flex-col gap-2">
+                            <label for="address" class="font-medium text-slate-700">Dirección</label>
+                            <input formControlName="address" pInputText id="address" type="text"
+                                placeholder="Ej. Calle Principal 123" class="w-full grayscale-input p-3" />
+                        </div>
+
+                        <div class="field flex flex-col gap-2">
                             <label class="font-medium text-slate-700">Región / Ciudad</label>
                             <p-select [options]="groupedCities" formControlName="city"
                                 placeholder="Selecciona tu ciudad" [group]="true" styleClass="w-full grayscale-input">
@@ -114,19 +137,25 @@
                             <label class="font-medium text-slate-700">Fecha de Nacimiento</label>
                             <p-datepicker formControlName="birthDate" styleClass="w-full grayscale-input"
                                 placeholder="Elige una fecha" [showIcon]="true"></p-datepicker>
+                            <small
+                                *ngIf="step2Form.get('birthDate')?.hasError('underage') && step2Form.get('birthDate')?.touched"
+                                class="text-red-500">Debes ser mayor de 18 años.</small>
                         </div>
 
                         <div class="field flex flex-col gap-2">
                             <label class="font-medium text-slate-700">Teléfono</label>
-                            <p-inputMask formControlName="phone" mask="(999) 999-9999" placeholder="(999) 999-9999"
-                                styleClass="w-full grayscale-input p-3"></p-inputMask>
+                            <input formControlName="phone" pInputText id="phone" type="text"
+                                placeholder="Ej. 1234567890" class="w-full grayscale-input p-3" />
+                            <small *ngIf="step2Form.get('phone')?.hasError('pattern')" class="text-red-500">Solo se
+                                permiten números.</small>
                         </div>
 
                         <div class="flex pt-6 justify-between mt-4">
                             <p-button (onClick)="activateCallback(1)" label="Atrás" severity="secondary"
                                 icon="pi pi-arrow-left" [outlined]="true" />
                             <p-button (onClick)="completeRegistration()" label="Completar" icon="pi pi-check"
-                                iconPos="right" severity="contrast" [disabled]="step2Form.invalid" />
+                                iconPos="right" severity="contrast"
+                                [disabled]="step1Form.invalid || step2Form.invalid" />
                         </div>
                     </form>
                 </ng-template>
