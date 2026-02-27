@@ -1,51 +1,28 @@
-<div class="flex h-screen w-full bg-slate-50 overflow-hidden">
+<div class="dashboard-container">
 
-    <!-- Mobile Header (only visible on small screens) -->
-    <div
-        class="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 fixed w-full top-0 z-50 shadow-sm">
-        <span class="font-bold text-lg tracking-tight text-slate-800">ERP-Luu</span>
-        <p-button icon="pi pi-bars" (onClick)="drawerVisible = true" [text]="true" severity="secondary"></p-button>
-    </div>
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">ERP-Luu</h1>
+            <p class="sidebar-subtitle">Administración ERP</p>
+        </div>
 
-    <!-- Desktop Sidebar -->
-    <aside class="hidden md:flex flex-col h-screen w-64 min-w-[16rem] bg-white border-r border-slate-200 z-10 shrink-0">
-        <ng-container *ngTemplateOutlet="sidebarContent"></ng-container>
+        <div class="sidebar-menu">
+            <p-panelmenu [model]="items" [multiple]="false"></p-panelmenu>
+        </div>
+
+        <div class="sidebar-footer">v. 1.0.0</div>
     </aside>
 
-    <!-- Mobile Drawer (PrimeNG Drawer component) -->
-    <p-drawer [(visible)]="drawerVisible" [modal]="true">
-        <ng-container *ngTemplateOutlet="sidebarContent"></ng-container>
-    </p-drawer>
-
-    <!-- Shared Sidebar Content Template -->
-    <ng-template #sidebarContent>
-        <div class="flex flex-col h-full justify-between overflow-hidden">
-            <!-- Top: Title + Menu -->
-            <div class="p-5 flex flex-col gap-1 overflow-y-auto">
-                <h1 class="text-xl font-bold tracking-tight text-slate-900 mb-0">ERP-Luu</h1>
-                <p class="text-slate-400 text-xs mb-4">Administración ERP</p>
-
-                <!-- PanelMenu Navigation -->
-                <p-panelmenu [model]="items" [multiple]="true" styleClass="w-full"></p-panelmenu>
-            </div>
-
-            <!-- Bottom: Version -->
-            <div class="p-4 border-t border-slate-200 text-slate-400 text-xs text-center font-mono shrink-0">
-                v. 1.0.0
-            </div>
-        </div>
-    </ng-template>
-
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col min-h-screen overflow-y-auto pt-[56px] md:pt-0">
-        <!-- Desktop Top Header -->
-        <div class="hidden md:flex bg-white border-b border-slate-200 shadow-sm h-14 items-center px-6 shrink-0">
-            <span class="text-base font-semibold text-slate-700">Panel de Control</span>
+    <main class="main-content">
+        <div class="main-header">
+            <span class="main-header-title">Panel de Control</span>
         </div>
 
-        <!-- Page Content -->
-        <div class="flex-1 p-4 md:p-8">
+        <div class="main-body">
             <router-outlet></router-outlet>
         </div>
     </main>
+
 </div>
