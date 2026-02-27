@@ -11,7 +11,12 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     providePrimeNG({
-      theme: { preset: Lara }
+      theme: {
+        preset: Lara,
+        options: {
+          darkModeSelector: '.app-dark'
+        }
+      }
     })
   ]
 };
