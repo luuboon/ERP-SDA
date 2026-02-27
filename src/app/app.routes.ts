@@ -6,6 +6,25 @@ export const routes: Routes = [
         loadComponent: () => import('./presentation/pages/landing/landing.component').then(m => m.LandingComponent)
     },
     {
+        path: 'dashboard',
+        loadComponent: () => import('./presentation/layouts/dashboard-layout/dashboard-layout').then(m => m.DashboardLayout),
+        children: [
+            {
+                path: 'group',
+                loadComponent: () => import('./presentation/pages/dashboard/group/group').then(m => m.Group)
+            },
+            {
+                path: 'user',
+                loadComponent: () => import('./presentation/pages/dashboard/user/user').then(m => m.User)
+            },
+            {
+                path: '',
+                redirectTo: 'group',
+                pathMatch: 'full'
+            }
+        ]
+    },
+    {
         path: 'auth',
         loadComponent: () => import('./presentation/layouts/auth-layout/auth-layout.component').then(m => m.AuthLayoutComponent),
         children: [

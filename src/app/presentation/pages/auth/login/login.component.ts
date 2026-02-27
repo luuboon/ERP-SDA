@@ -36,7 +36,7 @@ export class LoginComponent {
       if (email === 'admin@erp.com' && password === 'Admin123!@#') {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Bienvenido a ERP-Luu' });
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/dashboard/group']);
         }, 1000);
       } else {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Credenciales Inválidas' });
