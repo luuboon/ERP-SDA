@@ -1,0 +1,135 @@
+.group-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.page-count {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Table card */
+:host ::ng-deep .table-card .p-card-body {
+    padding: 0;
+}
+
+:host ::ng-deep .table-card .p-card-content {
+    padding: 0;
+}
+
+/* ID badge */
+.id-badge {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.25rem;
+    cursor: default;
+    white-space: nowrap;
+}
+
+/* Group name */
+.group-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Stat badges */
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.stat-badge.tickets {
+    color: #6366f1;
+}
+
+.stat-icon {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+/* Row actions */
+.row-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem !important;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    opacity: 0.4;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Dialog form */
+.dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: 0.5rem;
+}
+
+.dialog-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.field {
+    width: 100%;
+}
+
+.field-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f1f5f9;
+}

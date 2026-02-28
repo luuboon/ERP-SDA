@@ -3,25 +3,50 @@
     <!-- Left Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h1 class="sidebar-title">ERP-Luu</h1>
-            <p class="sidebar-subtitle">Administración ERP</p>
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon pi pi-server"></span>
+            </div>
+            <div class="sidebar-brand">
+                <h1 class="sidebar-title">ERP-Luu</h1>
+                <p class="sidebar-subtitle">Administración</p>
+            </div>
         </div>
 
-        <div class="sidebar-menu">
-            <p-panelmenu [model]="items" [multiple]="false"></p-panelmenu>
-        </div>
+        <nav class="sidebar-nav">
+            <p class="nav-section-label">Módulos</p>
+            @for (item of navItems(); track item.route) {
+            <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: false }">
+                <span class="nav-item-icon" [class]="item.icon"></span>
+                <span class="nav-item-label">{{ item.label }}</span>
+            </a>
+            }
+        </nav>
 
-        <div class="sidebar-footer">v. 1.0.0</div>
+        <div class="sidebar-footer">
+            <span class="sidebar-version">v 1.0.0</span>
+        </div>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="main-header">
-            <span class="main-header-title">Panel de Control</span>
-        </div>
+        <header class="main-header">
+            <div class="main-header-left">
+                <div class="main-header-breadcrumb">
+                    <span class="pi pi-home breadcrumb-icon"></span>
+                    <span class="breadcrumb-sep">/</span>
+                    <span class="breadcrumb-current">Panel de Control</span>
+                </div>
+            </div>
+            <div class="main-header-right">
+                <div class="header-avatar">
+                    <span class="pi pi-user avatar-icon"></span>
+                </div>
+            </div>
+        </header>
 
         <div class="main-body">
-            <router-outlet></router-outlet>
+            <router-outlet />
         </div>
     </main>
 

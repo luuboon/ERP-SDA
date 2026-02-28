@@ -1,30 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { PanelMenuModule } from 'primeng/panelmenu';
-import { MenuItem } from 'primeng/api';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
+interface NavItem {
+  label: string;
+  icon: string;
+  route: string;
+}
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, PanelMenuModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
-export class DashboardLayout implements OnInit {
-  items: MenuItem[] = [];
-
-  ngOnInit() {
-    this.items = [
-      {
-        label: 'Group',
-        icon: 'pi pi-users',
-        routerLink: '/dashboard/group'
-      },
-      {
-        label: 'User',
-        icon: 'pi pi-user',
-        routerLink: '/dashboard/user'
-      }
-    ];
-  }
+export class DashboardLayout {
+  readonly navItems = signal<NavItem[]>([
+    { label: 'Groups', icon: 'pi pi-users', route: '/dashboard/group' },
+    { label: 'Users', icon: 'pi pi-user', route: '/dashboard/user' },
+  ]);
 }

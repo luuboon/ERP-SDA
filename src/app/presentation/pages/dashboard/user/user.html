@@ -1,21 +1,116 @@
-<div class="flex flex-col gap-6 max-w-3xl">
-    <p-card header="Profile Data" styleClass="w-full shadow-sm border border-slate-200">
-        <div class="flex flex-col gap-5 mt-2">
+<p-toast />
+<p-confirmDialog />
 
-            <div class="flex items-center gap-4 mb-4">
-                <p-skeleton width="4rem" height="4rem" borderRadius="50%"></p-skeleton>
-                <div class="flex flex-col gap-2 w-full">
-                    <p-skeleton width="40%" height="1.5rem"></p-skeleton>
-                    <p-skeleton width="25%" height="1rem"></p-skeleton>
-                </div>
-            </div>
+<div class="user-page">
 
-            <p-skeleton width="100%" height="2rem"></p-skeleton>
-            <p-skeleton width="100%" height="2rem"></p-skeleton>
-            <p-skeleton width="75%" height="2rem"></p-skeleton>
-            <p-skeleton width="100%" height="2rem"></p-skeleton>
-            <p-skeleton width="50%" height="2rem"></p-skeleton>
-
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2 class="page-title">Users</h2>
+            <span class="page-count">{{ users().length }} usuarios</span>
         </div>
+        <p-button label="Nuevo Usuario" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+    </div>
+
+    <!-- Users Table -->
+    <p-card styleClass="table-card">
+        <p-table [value]="users()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
+            [tableStyle]="{ 'min-width': '45rem' }" styleClass="p-datatable-sm" dataKey="id">
+
+            <ng-template #header>
+                <tr>
+                    <th style="width: 100px">ID</th>
+                    <th pSortableColumn="name">
+                        Nombre <p-sortIcon field="name" />
+                    </th>
+                    <th pSortableColumn="email">
+                        Email <p-sortIcon field="email" />
+                    </th>
+                    <th pSortableColumn="role" style="width: 160px;">
+                        Rol <p-sortIcon field="role" />
+                    </th>
+                    <th style="width: 110px; text-align: center;">Acciones</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-user>
+                <tr>
+                    <td>
+                        <span class="id-badge" [pTooltip]="user.id" tooltipPosition="top">
+                            {{ shortId(user.id) }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="user-name-cell">
+                            <span class="user-avatar-chip">{{ user.name[0] }}</span>
+                            <span class="user-name">{{ user.name }}</span>
+                        </div>
+                    </td>
+                    <td class="email-cell">{{ user.email }}</td>
+                    <td>
+                        <p-tag [value]="user.role" [severity]="roleSeverity(user.role)" />
+                    </td>
+                    <td style="text-align: center;">
+                        <div class="row-actions">
+                            <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
+                                pTooltip="Editar" (onClick)="openEdit(user)" />
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                                pTooltip="Eliminar" (onClick)="confirmDelete(user)" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template #empty>
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <span class="pi pi-users empty-icon"></span>
+                        <p>No hay usuarios registrados. Crea el primero.</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
     </p-card>
 </div>
+
+<!-- Create / Edit Dialog -->
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Editar Usuario' : 'Nuevo Usuario'" [modal]="true"
+    [style]="{ width: '440px' }" [closeOnEscape]="true" (onHide)="userForm.reset()">
+
+    <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="dialog-form">
+        <div class="dialog-fields">
+
+            <div class="field">
+                <p-iftalabel>
+                    <input pInputText id="uname" formControlName="name"
+                        [invalid]="userForm.controls['name'].invalid && userForm.controls['name'].touched"
+                        class="w-full" />
+                    <label for="uname">Nombre completo</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field">
+                <p-iftalabel>
+                    <input pInputText id="uemail" formControlName="email"
+                        [invalid]="userForm.controls['email'].invalid && userForm.controls['email'].touched"
+                        class="w-full" />
+                    <label for="uemail">Correo electrónico</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field">
+                <p-iftalabel>
+                    <p-select id="urole" formControlName="role" [options]="roles" placeholder=" " styleClass="w-full" />
+                    <label for="urole">Rol</label>
+                </p-iftalabel>
+            </div>
+        </div>
+
+        <div class="dialog-footer">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true" type="button"
+                (onClick)="dialogVisible.set(false)" />
+            <p-button [label]="editingId() ? 'Guardar cambios' : 'Crear usuario'" icon="pi pi-check" severity="contrast"
+                type="submit" [disabled]="userForm.invalid" />
+        </div>
+    </form>
+</p-dialog>

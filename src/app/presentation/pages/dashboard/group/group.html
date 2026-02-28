@@ -1,38 +1,158 @@
-<div class="flex flex-col gap-6">
-    <div class="flex items-center justify-between">
-        <h2 class="text-3xl font-bold text-slate-800">Group</h2>
-        <div class="bg-slate-200 text-slate-800 px-4 py-2 rounded-full font-semibold border border-slate-300">
-            Total: 12
+<p-toast />
+<p-confirmDialog />
+
+<div class="group-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2 class="page-title">Groups</h2>
+            <span class="page-count">{{ groups().length }} grupos</span>
         </div>
+        <p-button label="Nuevo Grupo" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
     </div>
 
-    <div>
-        <h3 class="text-xl font-semibold text-slate-700 mb-4 border-b border-slate-300 pb-2">Advances:</h3>
+    <!-- Groups Table -->
+    <p-card styleClass="table-card">
+        <p-table [value]="groups()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
+            [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm" dataKey="id">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p-card header="Feature A" subheader="En proceso" styleClass="shadow-sm border border-slate-200">
-                <p class="m-0 text-slate-600">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error
-                    repudiandae
-                    numquam deserunt quisquam repellat libero asperiores earum nam nobis.
-                </p>
-            </p-card>
+            <ng-template #header>
+                <tr>
+                    <th style="width: 100px">ID</th>
+                    <th pSortableColumn="name">
+                        Nombre <p-sortIcon field="name" />
+                    </th>
+                    <th pSortableColumn="category">
+                        Categoría <p-sortIcon field="category" />
+                    </th>
+                    <th pSortableColumn="level">
+                        Nivel <p-sortIcon field="level" />
+                    </th>
+                    <th>Autor</th>
+                    <th pSortableColumn="members" style="width: 100px; text-align: center;">
+                        Miembros <p-sortIcon field="members" />
+                    </th>
+                    <th pSortableColumn="tickets" style="width: 100px; text-align: center;">
+                        Tickets <p-sortIcon field="tickets" />
+                    </th>
+                    <th style="width: 110px; text-align: center;">Acciones</th>
+                </tr>
+            </ng-template>
 
-            <p-card header="Feature B" subheader="Pendiente" styleClass="shadow-sm border border-slate-200">
-                <p class="m-0 text-slate-600">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error
-                    repudiandae
-                    numquam deserunt quisquam repellat libero asperiores earum nam nobis.
-                </p>
-            </p-card>
+            <ng-template #body let-group>
+                <tr>
+                    <td>
+                        <span class="id-badge" [pTooltip]="group.id" tooltipPosition="top">
+                            {{ shortId(group.id) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="group-name">{{ group.name }}</span>
+                    </td>
+                    <td>{{ group.category }}</td>
+                    <td>
+                        <p-tag [value]="group.level" [severity]="levelSeverity(group.level)" />
+                    </td>
+                    <td>{{ group.author }}</td>
+                    <td style="text-align: center;">
+                        <span class="stat-badge">
+                            <span class="pi pi-users stat-icon"></span>
+                            {{ group.members }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="stat-badge tickets">
+                            <span class="pi pi-ticket stat-icon"></span>
+                            {{ group.tickets }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <div class="row-actions">
+                            <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
+                                pTooltip="Editar" (onClick)="openEdit(group)" />
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                                pTooltip="Eliminar" (onClick)="confirmDelete(group)" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
 
-            <p-card header="Feature C" subheader="Completado" styleClass="shadow-sm border border-slate-200">
-                <p class="m-0 text-slate-600">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error
-                    repudiandae
-                    numquam deserunt quisquam repellat libero asperiores earum nam nobis.
-                </p>
-            </p-card>
-        </div>
-    </div>
+            <ng-template #empty>
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <span class="pi pi-users empty-icon"></span>
+                        <p>No hay grupos registrados. Crea el primero.</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
 </div>
+
+<!-- Create / Edit Dialog -->
+<p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Editar Grupo' : 'Nuevo Grupo'" [modal]="true"
+    [style]="{ width: '520px' }" [closeOnEscape]="true" (onHide)="groupForm.reset()">
+
+    <form [formGroup]="groupForm" (ngSubmit)="saveGroup()" class="dialog-form">
+        <div class="dialog-fields">
+
+            <div class="field">
+                <p-iftalabel>
+                    <input pInputText id="gname" formControlName="name"
+                        [invalid]="groupForm.controls['name'].invalid && groupForm.controls['name'].touched"
+                        class="w-full" />
+                    <label for="gname">Nombre del grupo</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field-row-2col">
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="gcategory" formControlName="category" [options]="categories" placeholder=" "
+                            styleClass="w-full" />
+                        <label for="gcategory">Categoría</label>
+                    </p-iftalabel>
+                </div>
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="glevel" formControlName="level" [options]="levels" placeholder=" "
+                            styleClass="w-full" />
+                        <label for="glevel">Nivel</label>
+                    </p-iftalabel>
+                </div>
+            </div>
+
+            <div class="field">
+                <p-iftalabel>
+                    <input pInputText id="gauthor" formControlName="author"
+                        [invalid]="groupForm.controls['author'].invalid && groupForm.controls['author'].touched"
+                        class="w-full" />
+                    <label for="gauthor">Autor</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field-row-2col">
+                <div class="field">
+                    <p-iftalabel>
+                        <p-inputnumber id="gmembers" formControlName="members" [min]="0" styleClass="w-full" />
+                        <label for="gmembers">Miembros</label>
+                    </p-iftalabel>
+                </div>
+                <div class="field">
+                    <p-iftalabel>
+                        <p-inputnumber id="gtickets" formControlName="tickets" [min]="0" styleClass="w-full" />
+                        <label for="gtickets">Tickets</label>
+                    </p-iftalabel>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-footer">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true" type="button"
+                (onClick)="dialogVisible.set(false)" />
+            <p-button [label]="editingId() ? 'Guardar cambios' : 'Crear grupo'" icon="pi pi-check" severity="contrast"
+                type="submit" [disabled]="groupForm.invalid" />
+        </div>
+    </form>
+</p-dialog>
