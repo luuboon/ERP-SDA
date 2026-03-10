@@ -17,7 +17,7 @@
     width: 240px;
     min-width: 240px;
     height: 100vh;
-    background: #0f172a;
+    background: linear-gradient(180deg, #0c1e4a 0%, #1a3a6e 50%, #0f2548 100%);
     overflow-y: auto;
     position: relative;
     z-index: 10;
@@ -38,7 +38,7 @@
     justify-content: center;
     width: 2.25rem;
     height: 2.25rem;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     border-radius: 0.5rem;
     flex-shrink: 0;
 }
@@ -102,13 +102,13 @@
 }
 
 .nav-item.active {
-    background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
     font-weight: 600;
 }
 
 .nav-item.active .nav-item-icon {
-    color: #818cf8;
+    color: #60a5fa;
 }
 
 .nav-item-icon {
@@ -201,7 +201,7 @@
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     cursor: pointer;
     transition: opacity 0.15s ease;
 }

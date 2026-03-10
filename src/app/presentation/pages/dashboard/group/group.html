@@ -15,7 +15,7 @@
     <!-- Groups Table -->
     <p-card styleClass="table-card">
         <p-table [value]="groups()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
-            [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm" dataKey="id">
+            [tableStyle]="{ 'min-width': '55rem' }" styleClass="p-datatable-sm" dataKey="id">
 
             <ng-template #header>
                 <tr>
@@ -30,13 +30,9 @@
                         Nivel <p-sortIcon field="level" />
                     </th>
                     <th>Autor</th>
-                    <th pSortableColumn="members" style="width: 100px; text-align: center;">
-                        Miembros <p-sortIcon field="members" />
-                    </th>
-                    <th pSortableColumn="tickets" style="width: 100px; text-align: center;">
-                        Tickets <p-sortIcon field="tickets" />
-                    </th>
-                    <th style="width: 110px; text-align: center;">Acciones</th>
+                    <th style="width: 100px; text-align: center;">Miembros</th>
+                    <th style="width: 100px; text-align: center;">Tickets</th>
+                    <th style="width: 140px; text-align: center;">Acciones</th>
                 </tr>
             </ng-template>
 
@@ -48,7 +44,7 @@
                         </span>
                     </td>
                     <td>
-                        <span class="group-name">{{ group.name }}</span>
+                        <span class="group-name clickable" (click)="viewGroup(group)">{{ group.name }}</span>
                     </td>
                     <td>{{ group.category }}</td>
                     <td>
@@ -58,7 +54,7 @@
                     <td style="text-align: center;">
                         <span class="stat-badge">
                             <span class="pi pi-users stat-icon"></span>
-                            {{ group.members }}
+                            {{ group.memberIds.length }}
                         </span>
                     </td>
                     <td style="text-align: center;">
@@ -69,6 +65,8 @@
                     </td>
                     <td style="text-align: center;">
                         <div class="row-actions">
+                            <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true"
+                                pTooltip="Ver detalle" (onClick)="viewGroup(group)" />
                             <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
                                 pTooltip="Editar" (onClick)="openEdit(group)" />
                             <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
@@ -130,21 +128,6 @@
                         class="w-full" />
                     <label for="gauthor">Autor</label>
                 </p-iftalabel>
-            </div>
-
-            <div class="field-row-2col">
-                <div class="field">
-                    <p-iftalabel>
-                        <p-inputnumber id="gmembers" formControlName="members" [min]="0" styleClass="w-full" />
-                        <label for="gmembers">Miembros</label>
-                    </p-iftalabel>
-                </div>
-                <div class="field">
-                    <p-iftalabel>
-                        <p-inputnumber id="gtickets" formControlName="tickets" [min]="0" styleClass="w-full" />
-                        <label for="gtickets">Tickets</label>
-                    </p-iftalabel>
-                </div>
             </div>
         </div>
 

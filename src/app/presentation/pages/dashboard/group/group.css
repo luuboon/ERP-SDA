@@ -57,6 +57,15 @@
     color: #1e293b;
 }
 
+.group-name.clickable {
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.group-name.clickable:hover {
+    color: #6366f1;
+}
+
 /* Stat badges */
 .stat-badge {
     display: inline-flex;

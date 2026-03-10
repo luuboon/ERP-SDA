@@ -5,25 +5,25 @@ import { User } from '../../core/models/user.model';
 export class UserService {
     private _users = signal<User[]>([
         {
-            id: crypto.randomUUID(),
+            id: 'u-admin',
             name: 'Admin ERP',
             email: 'admin@erp.com',
             role: 'Administrador',
         },
         {
-            id: crypto.randomUUID(),
+            id: 'u-ana',
             name: 'Ana García',
             email: 'ana.garcia@erp.com',
             role: 'Analista',
         },
         {
-            id: crypto.randomUUID(),
+            id: 'u-carlos',
             name: 'Carlos Méndez',
             email: 'carlos.mendez@erp.com',
             role: 'Soporte',
         },
         {
-            id: crypto.randomUUID(),
+            id: 'u-laura',
             name: 'Laura Torres',
             email: 'laura.torres@erp.com',
             role: 'Viewer',
@@ -32,8 +32,16 @@ export class UserService {
 
     readonly users = this._users.asReadonly();
 
+    getById(id: string): User | undefined {
+        return this._users().find(u => u.id === id);
+    }
+
+    getByEmail(email: string): User | undefined {
+        return this._users().find(u => u.email === email);
+    }
+
     create(data: Omit<User, 'id'>): void {
-        const newUser: User = { id: crypto.randomUUID(), ...data };
+        const newUser: User = { id: 'u-' + crypto.randomUUID().slice(0, 8), ...data };
         this._users.update(list => [...list, newUser]);
     }
 

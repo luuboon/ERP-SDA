@@ -5,6 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { GroupService } from '../../../../application/services/group.service';
 import { Group as GroupItem } from '../../../../core/models/group.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -13,7 +14,6 @@ import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { ToastModule } from 'primeng/toast';
@@ -35,7 +35,6 @@ const LEVELS = ['Junior', 'Mid', 'Senior', 'Lead'];
     TableModule,
     DialogModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
     IftaLabelModule,
     ToastModule,
@@ -52,6 +51,7 @@ export class Group {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   readonly groups = this.groupService.groups;
   readonly categories = CATEGORIES;
@@ -65,13 +65,11 @@ export class Group {
     category: ['', Validators.required],
     level: ['', Validators.required],
     author: ['', Validators.required],
-    members: [0, [Validators.required, Validators.min(0)]],
-    tickets: [0, [Validators.required, Validators.min(0)]],
   });
 
   openCreate(): void {
     this.editingId.set(null);
-    this.groupForm.reset({ members: 0, tickets: 0 });
+    this.groupForm.reset();
     this.dialogVisible.set(true);
   }
 
@@ -82,22 +80,24 @@ export class Group {
       category: group.category,
       level: group.level,
       author: group.author,
-      members: group.members,
-      tickets: group.tickets,
     });
     this.dialogVisible.set(true);
   }
 
+  viewGroup(group: GroupItem): void {
+    this.router.navigate(['/dashboard/group', group.id]);
+  }
+
   saveGroup(): void {
     if (this.groupForm.invalid) return;
-    const { name, category, level, author, members, tickets } = this.groupForm.value;
+    const { name, category, level, author } = this.groupForm.value;
     const id = this.editingId();
 
     if (id) {
-      this.groupService.update(id, { name: name!, category: category!, level: level!, author: author!, members: members!, tickets: tickets! });
+      this.groupService.update(id, { name: name!, category: category!, level: level!, author: author! });
       this.messageService.add({ severity: 'success', summary: 'Grupo actualizado', detail: `"${name}" se actualizó correctamente` });
     } else {
-      this.groupService.create({ name: name!, category: category!, level: level!, author: author!, members: members!, tickets: tickets! });
+      this.groupService.create({ name: name!, category: category!, level: level!, author: author!, memberIds: [], tickets: 0 });
       this.messageService.add({ severity: 'success', summary: 'Grupo creado', detail: `"${name}" fue creado exitosamente` });
     }
     this.dialogVisible.set(false);

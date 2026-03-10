@@ -1,0 +1,124 @@
+<p-toast />
+<p-confirmDialog />
+
+@if (group(); as g) {
+<div class="group-detail-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <p-button icon="pi pi-arrow-left" severity="secondary" [text]="true" [rounded]="true" (onClick)="goBack()"
+                pTooltip="Volver a grupos" />
+            <div>
+                <h2 class="page-title">{{ g.name }}</h2>
+                <span class="page-subtitle">{{ g.category }} · {{ g.level }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <!-- Left: Members -->
+        <div class="detail-section">
+            <p-card styleClass="members-card">
+                <ng-template #header>
+                    <div class="card-header-custom">
+                        <h3 class="card-title">
+                            <span class="pi pi-users"></span> Miembros
+                            <span class="badge">{{ members().length }}</span>
+                        </h3>
+                    </div>
+                </ng-template>
+
+                <!-- Add member row -->
+                <div class="add-member-row">
+                    <input pInputText [value]="addMemberInput()" (input)="addMemberInput.set($any($event.target).value)"
+                        (keydown.enter)="addMember()" placeholder="Email o nombre del usuario..." class="w-full" />
+                    <p-button icon="pi pi-plus" severity="contrast" (onClick)="addMember()"
+                        [disabled]="!addMemberInput().trim()" pTooltip="Agregar miembro" />
+                </div>
+
+                <!-- Members list -->
+                @if (members().length > 0) {
+                <div class="members-list">
+                    @for (member of members(); track member.id) {
+                    <div class="member-row">
+                        <div class="member-info">
+                            <span class="member-avatar">{{ member.name[0] }}</span>
+                            <div class="member-text">
+                                <span class="member-name">{{ member.name }}</span>
+                                <span class="member-email">{{ member.email }}</span>
+                            </div>
+                        </div>
+                        <div class="member-actions">
+                            <p-tag [value]="member.role" severity="secondary" />
+                            <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true" size="small"
+                                pTooltip="Eliminar del grupo" (onClick)="confirmRemoveMember(member.id, member.name)" />
+                        </div>
+                    </div>
+                    }
+                </div>
+                } @else {
+                <div class="empty-members">
+                    <span class="pi pi-user-plus empty-icon"></span>
+                    <p>Sin miembros. Agrega el primero.</p>
+                </div>
+                }
+            </p-card>
+        </div>
+
+        <!-- Right: Tickets -->
+        <div class="detail-section">
+            <p-card styleClass="tickets-card">
+                <ng-template #header>
+                    <div class="card-header-custom">
+                        <h3 class="card-title">
+                            <span class="pi pi-ticket"></span> Tickets del grupo
+                            <span class="badge">{{ groupTickets().length }}</span>
+                        </h3>
+                    </div>
+                </ng-template>
+
+                @if (groupTickets().length > 0) {
+                <p-table [value]="groupTickets()" styleClass="p-datatable-sm" dataKey="id">
+                    <ng-template #header>
+                        <tr>
+                            <th>Título</th>
+                            <th style="width: 120px;">Estado</th>
+                            <th style="width: 100px;">Prioridad</th>
+                            <th>Asignado</th>
+                            <th style="width: 110px;">Fecha Límite</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-ticket>
+                        <tr>
+                            <td>
+                                <span class="ticket-link">{{ ticket.title }}</span>
+                            </td>
+                            <td>
+                                <p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" />
+                            </td>
+                            <td>
+                                <p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)" />
+                            </td>
+                            <td>{{ getUserName(ticket.assignedTo) }}</td>
+                            <td>{{ ticket.dueDate | date:'dd/MM/yyyy' }}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                } @else {
+                <div class="empty-tickets">
+                    <span class="pi pi-ticket empty-icon"></span>
+                    <p>Sin tickets asignados a este grupo.</p>
+                </div>
+                }
+            </p-card>
+        </div>
+    </div>
+</div>
+} @else {
+<div class="not-found">
+    <span class="pi pi-exclamation-circle not-found-icon"></span>
+    <h3>Grupo no encontrado</h3>
+    <p-button label="Volver a grupos" icon="pi pi-arrow-left" severity="secondary" (onClick)="goBack()" />
+</div>
+}

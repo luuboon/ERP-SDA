@@ -1,0 +1,124 @@
+<div class="dashboard-page">
+
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Panel de Control</h1>
+                <p class="hero-subtitle">Resumen de actividad y gestión de tickets del equipo</p>
+            </div>
+            <div class="hero-actions">
+                <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="goToTickets()" />
+                <p-button label="Ver todos" icon="pi pi-arrow-right" severity="secondary" [outlined]="true"
+                    (onClick)="goToTickets()" />
+            </div>
+        </div>
+        <!-- Hero KPIs -->
+        <div class="hero-kpis">
+            <div class="kpi-item">
+                <span class="kpi-value">{{ totalTickets() }}</span>
+                <span class="kpi-label">Total Tickets</span>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-item">
+                <span class="kpi-value kpi-success">{{ completionRate() }}%</span>
+                <span class="kpi-label">Completados</span>
+            </div>
+            <div class="kpi-divider"></div>
+            <div class="kpi-item">
+                <span class="kpi-value" [class.kpi-danger]="overdueCount() > 0">{{ overdueCount() }}</span>
+                <span class="kpi-label">Vencidos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Breakdown -->
+    <div class="status-grid">
+        @for (item of statusItems(); track item.status) {
+        <div class="status-card" (click)="goToTickets(item.status)">
+            <div class="status-card-header">
+                <div class="status-card-icon" [style.background]="item.bg" [style.color]="item.color">
+                    <span class="pi" [class]="item.icon"></span>
+                </div>
+                <span class="status-card-pct" [style.color]="item.color">{{ item.pct }}%</span>
+            </div>
+            <span class="status-card-count">{{ item.count }}</span>
+            <span class="status-card-label">{{ item.label }}</span>
+            <div class="status-card-bar">
+                <div class="status-card-bar-fill" [style.width.%]="item.pct" [style.background]="item.color"></div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Two-column content -->
+    <div class="content-grid">
+
+        <!-- Left: Recent Activity -->
+        <div class="content-col">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="pi pi-history"></span> Actividad Reciente
+                </h3>
+                <p-button label="Ver todos" [text]="true" size="small" icon="pi pi-arrow-right" iconPos="right"
+                    (onClick)="goToTickets()" />
+            </div>
+            <div class="activity-list">
+                @for (ticket of recentTickets(); track ticket.id) {
+                <div class="activity-item" (click)="goToTickets()">
+                    <div class="activity-indicator" [style.background]="
+                        ticket.status === 'Pendiente' ? '#f59e0b' :
+                        ticket.status === 'En Progreso' ? '#3b82f6' :
+                        ticket.status === 'Revisión' ? '#8b5cf6' : '#10b981'
+                    "></div>
+                    <div class="activity-body">
+                        <span class="activity-title">{{ ticket.title }}</span>
+                        <div class="activity-meta">
+                            <p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" />
+                            <p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)" />
+                            <span class="activity-assignee">
+                                <span class="pi pi-user"></span>
+                                {{ getUserName(ticket.assignedTo) }}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="activity-date">{{ ticket.createdAt | date:'dd MMM' }}</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right: Groups Overview -->
+        <div class="content-col">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="pi pi-users"></span> Grupos
+                </h3>
+            </div>
+            <div class="groups-list">
+                @for (group of groupSummary(); track group.id) {
+                <div class="group-card" (click)="goToGroup(group.id)">
+                    <div class="group-card-left">
+                        <div class="group-avatar">{{ group.name[0] }}</div>
+                        <div class="group-card-info">
+                            <span class="group-card-name">{{ group.name }}</span>
+                            <span class="group-card-cat">{{ group.category }} · {{ group.level }}</span>
+                        </div>
+                    </div>
+                    <div class="group-card-stats">
+                        <div class="group-stat">
+                            <span class="group-stat-value">{{ group.memberIds.length }}</span>
+                            <span class="group-stat-label">Miembros</span>
+                        </div>
+                        <div class="group-stat">
+                            <span class="group-stat-value accent">{{ group.ticketCount }}</span>
+                            <span class="group-stat-label">Tickets</span>
+                        </div>
+                        <span class="pi pi-chevron-right group-arrow"></span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

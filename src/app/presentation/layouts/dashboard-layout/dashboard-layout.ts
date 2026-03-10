@@ -17,6 +17,8 @@ interface NavItem {
 })
 export class DashboardLayout {
   readonly navItems = signal<NavItem[]>([
+    { label: 'Dashboard', icon: 'pi pi-chart-bar', route: '/dashboard' },
+    { label: 'Tickets', icon: 'pi pi-ticket', route: '/dashboard/tickets' },
     { label: 'Groups', icon: 'pi pi-users', route: '/dashboard/group' },
     { label: 'Users', icon: 'pi pi-user', route: '/dashboard/user' },
   ]);

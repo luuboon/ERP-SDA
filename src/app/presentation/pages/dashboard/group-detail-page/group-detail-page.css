@@ -1,0 +1,204 @@
+.group-detail-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Detail grid */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Card headers */
+.card-header-custom {
+    padding: 1rem 1.25rem 0;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-title .pi {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #6366f1;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Add member */
+.add-member-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Members list */
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.75rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    border: 1px solid #f1f5f9;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.member-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.member-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.member-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.member-email {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+.member-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Ticket link */
+.ticket-link {
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.ticket-link:hover {
+    color: #6366f1;
+}
+
+/* Empty states */
+.empty-members,
+.empty-tickets {
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.4;
+}
+
+.empty-members p,
+.empty-tickets p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* Not found */
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 4rem;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.not-found-icon {
+    font-size: 3rem;
+    opacity: 0.4;
+}
+
+.not-found h3 {
+    margin: 0;
+    color: #64748b;
+}
+
+/* Table card overrides */
+:host ::ng-deep .members-card .p-card-body,
+:host ::ng-deep .tickets-card .p-card-body {
+    padding: 1rem 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

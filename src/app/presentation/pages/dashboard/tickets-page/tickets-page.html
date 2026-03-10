@@ -1,0 +1,300 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="tickets-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2 class="page-title">Tickets</h2>
+            <span class="page-count">{{ filteredTickets().length }} tickets</span>
+            @if (statusFilter()) {
+            <p-tag [value]="statusFilter()!" [severity]="statusSeverity(statusFilter()!)" />
+            <p-button icon="pi pi-times" severity="secondary" [text]="true" [rounded]="true" size="small"
+                pTooltip="Quitar filtro" (onClick)="clearFilter()" />
+            }
+        </div>
+        <div class="page-header-right">
+            <p-selectButton [options]="viewOptions" [(ngModel)]="currentView" optionLabel="label" optionValue="value"
+                styleClass="view-toggle" />
+            <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+        </div>
+    </div>
+
+    <!-- Kanban View -->
+    @if (currentView() === 'kanban') {
+    <div class="kanban-board">
+        @for (col of kanbanColumns; track col) {
+        <div class="kanban-column" pDroppable (onDrop)="onDrop(col)">
+            <div class="kanban-column-header">
+                <span class="kanban-column-dot" [style.background]="columnColor(col)"></span>
+                <span class="kanban-column-title">{{ col }}</span>
+                <span class="kanban-column-count">{{ ticketsByColumn(col).length }}</span>
+            </div>
+            <div class="kanban-column-body">
+                @for (ticket of ticketsByColumn(col); track ticket.id) {
+                <div class="kanban-card" pDraggable (onDragStart)="onDragStart(ticket)" (onDragEnd)="onDragEnd()"
+                    (click)="openDetail(ticket)">
+                    <div class="kanban-card-top">
+                        <span class="kanban-card-title">{{ ticket.title }}</span>
+                    </div>
+                    <div class="kanban-card-meta">
+                        <p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)" />
+                        <span class="kanban-card-assignee">
+                            <span class="pi pi-user"></span> {{ getUserName(ticket.assignedTo) }}
+                        </span>
+                    </div>
+                    <div class="kanban-card-bottom">
+                        <span class="kanban-card-group">{{ getGroupName(ticket.groupId) }}</span>
+                        <span class="kanban-card-date">
+                            <span class="pi pi-calendar"></span> {{ ticket.dueDate | date:'dd/MM' }}
+                        </span>
+                    </div>
+                </div>
+                }
+
+                @if (ticketsByColumn(col).length === 0) {
+                <div class="kanban-empty">Sin tickets</div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- List View -->
+    @if (currentView() === 'list') {
+    <p-card styleClass="table-card">
+        <p-table [value]="filteredTickets()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
+            [tableStyle]="{ 'min-width': '65rem' }" styleClass="p-datatable-sm" dataKey="id" [sortField]="'createdAt'"
+            [sortOrder]="-1">
+
+            <ng-template #header>
+                <tr>
+                    <th pSortableColumn="title">Título <p-sortIcon field="title" /></th>
+                    <th pSortableColumn="status" style="width: 130px;">Estado <p-sortIcon field="status" /></th>
+                    <th pSortableColumn="priority" style="width: 110px;">Prioridad <p-sortIcon field="priority" /></th>
+                    <th>Asignado</th>
+                    <th>Grupo</th>
+                    <th pSortableColumn="createdAt" style="width: 120px;">Creación <p-sortIcon field="createdAt" /></th>
+                    <th pSortableColumn="dueDate" style="width: 120px;">Fecha Límite <p-sortIcon field="dueDate" /></th>
+                    <th style="width: 100px; text-align: center;">Acciones</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-ticket>
+                <tr>
+                    <td>
+                        <span class="ticket-title-link" (click)="openDetail(ticket)">{{ ticket.title }}</span>
+                    </td>
+                    <td>
+                        <p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" />
+                    </td>
+                    <td>
+                        <p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)" />
+                    </td>
+                    <td>{{ getUserName(ticket.assignedTo) }}</td>
+                    <td>{{ getGroupName(ticket.groupId) }}</td>
+                    <td>{{ ticket.createdAt | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ ticket.dueDate | date:'dd/MM/yyyy' }}</td>
+                    <td style="text-align: center;">
+                        <div class="row-actions">
+                            <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true"
+                                (onClick)="openDetail(ticket)" />
+                            <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
+                                (onClick)="openEdit(ticket)" />
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template #empty>
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <span class="pi pi-ticket empty-icon"></span>
+                        <p>No hay tickets. Crea el primero.</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+    }
+</div>
+
+<!-- Create / Edit Ticket Dialog -->
+<p-dialog [(visible)]="createDialogVisible" [header]="editingId() ? 'Editar Ticket' : 'Nuevo Ticket'" [modal]="true"
+    [style]="{ width: '560px' }" [closeOnEscape]="true" (onHide)="ticketForm.reset()">
+
+    <form [formGroup]="ticketForm" (ngSubmit)="saveTicket()" class="dialog-form">
+        <div class="dialog-fields">
+
+            <div class="field">
+                <p-iftalabel>
+                    <input pInputText id="ttitle" formControlName="title"
+                        [invalid]="ticketForm.controls['title'].invalid && ticketForm.controls['title'].touched"
+                        class="w-full" />
+                    <label for="ttitle">Título</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field">
+                <p-iftalabel>
+                    <textarea pTextarea id="tdesc" formControlName="description" rows="3" class="w-full"
+                        [autoResize]="true"></textarea>
+                    <label for="tdesc">Descripción</label>
+                </p-iftalabel>
+            </div>
+
+            <div class="field-row-2col">
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="tpriority" formControlName="priority" [options]="priorities" placeholder=" "
+                            styleClass="w-full" />
+                        <label for="tpriority">Prioridad</label>
+                    </p-iftalabel>
+                </div>
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="tassigned" formControlName="assignedTo" [options]="userOptions()"
+                            optionLabel="label" optionValue="value" placeholder=" " styleClass="w-full" />
+                        <label for="tassigned">Asignado a</label>
+                    </p-iftalabel>
+                </div>
+            </div>
+
+            <div class="field-row-2col">
+                <div class="field">
+                    <p-iftalabel>
+                        <p-datepicker id="tdue" formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full"
+                            [showIcon]="true" />
+                        <label for="tdue">Fecha límite</label>
+                    </p-iftalabel>
+                </div>
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="tgroup" formControlName="groupId" [options]="groupOptions()" optionLabel="label"
+                            optionValue="value" placeholder=" " styleClass="w-full" />
+                        <label for="tgroup">Grupo</label>
+                    </p-iftalabel>
+                </div>
+            </div>
+
+            @if (editingId()) {
+            <div class="field">
+                <p-iftalabel>
+                    <p-select id="tstatus" formControlName="status" [options]="statuses" placeholder=" "
+                        styleClass="w-full" />
+                    <label for="tstatus">Estado</label>
+                </p-iftalabel>
+            </div>
+            }
+        </div>
+
+        <div class="dialog-footer">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true" type="button"
+                (onClick)="createDialogVisible.set(false)" />
+            <p-button [label]="editingId() ? 'Guardar cambios' : 'Crear ticket'" icon="pi pi-check" severity="contrast"
+                type="submit" [disabled]="ticketForm.invalid" />
+        </div>
+    </form>
+</p-dialog>
+
+<!-- Ticket Detail Dialog -->
+@if (selectedTicket(); as ticket) {
+<p-dialog [(visible)]="detailDialogVisible" [header]="ticket.title" [modal]="true" [style]="{ width: '680px' }"
+    [closeOnEscape]="true">
+
+    <div class="detail-content">
+        <!-- Status & Priority badges -->
+        <div class="detail-badges">
+            <p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" />
+            <p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)" />
+        </div>
+
+        <!-- Info grid -->
+        <div class="detail-info-grid">
+            <div class="detail-info-item">
+                <span class="detail-label">Asignado a</span>
+                <span class="detail-value">{{ getUserName(ticket.assignedTo) }}</span>
+            </div>
+            <div class="detail-info-item">
+                <span class="detail-label">Grupo</span>
+                <span class="detail-value">{{ getGroupName(ticket.groupId) }}</span>
+            </div>
+            <div class="detail-info-item">
+                <span class="detail-label">Fecha de creación</span>
+                <span class="detail-value">{{ ticket.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="detail-info-item">
+                <span class="detail-label">Fecha límite</span>
+                <span class="detail-value">{{ ticket.dueDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-section">
+            <h4 class="detail-section-title">Descripción</h4>
+            <p class="detail-description">{{ ticket.description }}</p>
+        </div>
+
+        <!-- Comments -->
+        <div class="detail-section">
+            <h4 class="detail-section-title">
+                Comentarios <span class="comment-count">({{ ticket.comments.length }})</span>
+            </h4>
+
+            @if (ticket.comments.length > 0) {
+            <div class="comments-list">
+                @for (comment of ticket.comments; track comment.id) {
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-avatar">{{ comment.author[0] }}</span>
+                        <span class="comment-author">{{ comment.author }}</span>
+                        <span class="comment-date">{{ comment.date | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <p class="comment-content">{{ comment.content }}</p>
+                </div>
+                }
+            </div>
+            }
+
+            <div class="comment-input-row">
+                <input pInputText [value]="newComment()" (input)="newComment.set($any($event.target).value)"
+                    placeholder="Escribe un comentario..." class="w-full" />
+                <p-button icon="pi pi-send" severity="contrast" (onClick)="addComment()"
+                    [disabled]="!newComment().trim()" />
+            </div>
+        </div>
+
+        <!-- History -->
+        @if (ticket.history.length > 0) {
+        <div class="detail-section">
+            <h4 class="detail-section-title">Historial de cambios</h4>
+            <div class="history-list">
+                @for (entry of ticket.history; track entry.id) {
+                <div class="history-item">
+                    <span class="history-dot"></span>
+                    <div class="history-body">
+                        <span class="history-text">
+                            <strong>{{ entry.changedBy }}</strong> cambió <em>{{ entry.field }}</em>
+                            de "{{ entry.oldValue }}" a "{{ entry.newValue }}"
+                        </span>
+                        <span class="history-date">{{ entry.date | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <ng-template #footer>
+        <div class="detail-footer">
+            <p-button label="Editar" icon="pi pi-pencil" severity="secondary" [outlined]="true"
+                (onClick)="openEdit(ticket); detailDialogVisible.set(false)" />
+            <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [outlined]="true"
+                (onClick)="confirmDelete(ticket)" />
+        </div>
+    </ng-template>
+</p-dialog>
+}

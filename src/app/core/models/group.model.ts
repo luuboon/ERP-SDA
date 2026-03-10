@@ -4,6 +4,6 @@ export interface Group {
     category: string;
     level: string;
     author: string;
-    members: number;
+    memberIds: string[];
     tickets: number;
 }
