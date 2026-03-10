@@ -82,6 +82,12 @@
     color: #475569;
 }
 
+.group-cell {
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
 /* Row actions */
 .row-actions {
     display: flex;

@@ -123,7 +123,8 @@
 
 <!-- Create / Edit Ticket Dialog -->
 <p-dialog [(visible)]="createDialogVisible" [header]="editingId() ? 'Editar Ticket' : 'Nuevo Ticket'" [modal]="true"
-    [style]="{ width: '560px' }" [closeOnEscape]="true" (onHide)="ticketForm.reset()">
+    [style]="{ width: '560px' }" [breakpoints]="{ '640px': '95vw' }" [closeOnEscape]="true"
+    (onHide)="ticketForm.reset()">
 
     <form [formGroup]="ticketForm" (ngSubmit)="saveTicket()" class="dialog-form">
         <div class="dialog-fields">
@@ -149,14 +150,15 @@
                 <div class="field">
                     <p-iftalabel>
                         <p-select id="tpriority" formControlName="priority" [options]="priorities" placeholder=" "
-                            styleClass="w-full" />
+                            appendTo="body" styleClass="w-full" />
                         <label for="tpriority">Prioridad</label>
                     </p-iftalabel>
                 </div>
                 <div class="field">
                     <p-iftalabel>
                         <p-select id="tassigned" formControlName="assignedTo" [options]="userOptions()"
-                            optionLabel="label" optionValue="value" placeholder=" " styleClass="w-full" />
+                            optionLabel="label" optionValue="value" placeholder=" " appendTo="body"
+                            styleClass="w-full" />
                         <label for="tassigned">Asignado a</label>
                     </p-iftalabel>
                 </div>
@@ -166,14 +168,14 @@
                 <div class="field">
                     <p-iftalabel>
                         <p-datepicker id="tdue" formControlName="dueDate" dateFormat="dd/mm/yy" styleClass="w-full"
-                            [showIcon]="true" />
+                            [showIcon]="true" appendTo="body" />
                         <label for="tdue">Fecha límite</label>
                     </p-iftalabel>
                 </div>
                 <div class="field">
                     <p-iftalabel>
                         <p-select id="tgroup" formControlName="groupId" [options]="groupOptions()" optionLabel="label"
-                            optionValue="value" placeholder=" " styleClass="w-full" />
+                            optionValue="value" placeholder=" " appendTo="body" styleClass="w-full" />
                         <label for="tgroup">Grupo</label>
                     </p-iftalabel>
                 </div>
@@ -182,7 +184,7 @@
             @if (editingId()) {
             <div class="field">
                 <p-iftalabel>
-                    <p-select id="tstatus" formControlName="status" [options]="statuses" placeholder=" "
+                    <p-select id="tstatus" formControlName="status" [options]="statuses" placeholder=" " appendTo="body"
                         styleClass="w-full" />
                     <label for="tstatus">Estado</label>
                 </p-iftalabel>
@@ -202,7 +204,7 @@
 <!-- Ticket Detail Dialog -->
 @if (selectedTicket(); as ticket) {
 <p-dialog [(visible)]="detailDialogVisible" [header]="ticket.title" [modal]="true" [style]="{ width: '680px' }"
-    [closeOnEscape]="true">
+    [breakpoints]="{ '768px': '95vw' }" [closeOnEscape]="true">
 
     <div class="detail-content">
         <!-- Status & Priority badges -->

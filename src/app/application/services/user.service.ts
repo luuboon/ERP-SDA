@@ -40,9 +40,10 @@ export class UserService {
         return this._users().find(u => u.email === email);
     }
 
-    create(data: Omit<User, 'id'>): void {
+    create(data: Omit<User, 'id'>): User {
         const newUser: User = { id: 'u-' + crypto.randomUUID().slice(0, 8), ...data };
         this._users.update(list => [...list, newUser]);
+        return newUser;
     }
 
     update(id: string, changes: Partial<Omit<User, 'id'>>): void {

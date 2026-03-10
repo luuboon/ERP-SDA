@@ -31,10 +31,11 @@
 
                 <!-- Add member row -->
                 <div class="add-member-row">
-                    <input pInputText [value]="addMemberInput()" (input)="addMemberInput.set($any($event.target).value)"
-                        (keydown.enter)="addMember()" placeholder="Email o nombre del usuario..." class="w-full" />
+                    <p-select [options]="availableUsers()" optionLabel="label" optionValue="value"
+                        placeholder="Seleccionar usuario..." [(ngModel)]="selectedUserId" appendTo="body"
+                        styleClass="w-full" [filter]="true" filterPlaceholder="Buscar usuario..." />
                     <p-button icon="pi pi-plus" severity="contrast" (onClick)="addMember()"
-                        [disabled]="!addMemberInput().trim()" pTooltip="Agregar miembro" />
+                        [disabled]="!selectedUserId()" pTooltip="Agregar miembro" />
                 </div>
 
                 <!-- Members list -->

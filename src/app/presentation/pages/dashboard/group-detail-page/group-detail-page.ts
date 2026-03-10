@@ -22,7 +22,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { AutoCompleteModule } from 'primeng/autocomplete';
+import { SelectModule } from 'primeng/select';
 
 @Component({
     selector: 'app-group-detail-page',
@@ -39,7 +39,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
         ConfirmDialogModule,
         TagModule,
         TooltipModule,
-        AutoCompleteModule,
+        SelectModule,
     ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './group-detail-page.html',
@@ -55,7 +55,7 @@ export class GroupDetailPage implements OnInit {
     private confirmationService = inject(ConfirmationService);
 
     group = signal<Group | null>(null);
-    addMemberInput = signal('');
+    selectedUserId = signal<string | null>(null);
 
     readonly members = computed(() => {
         const g = this.group();
@@ -63,6 +63,14 @@ export class GroupDetailPage implements OnInit {
         return g.memberIds
             .map(id => this.userService.getById(id))
             .filter(u => u !== undefined);
+    });
+
+    readonly availableUsers = computed(() => {
+        const g = this.group();
+        if (!g) return [];
+        return this.userService.users()
+            .filter(u => !g.memberIds.includes(u.id))
+            .map(u => ({ label: `${u.name} (${u.email})`, value: u.id }));
     });
 
     readonly groupTickets = computed(() => {
@@ -91,26 +99,17 @@ export class GroupDetailPage implements OnInit {
 
     addMember(): void {
         const g = this.group();
-        const input = this.addMemberInput().trim();
-        if (!g || !input) return;
+        const userId = this.selectedUserId();
+        if (!g || !userId) return;
 
-        // Try by email first, then by name
-        let success = this.groupService.addMemberByEmail(g.id, input);
-        if (!success) {
-            const user = this.userService.users().find(u =>
-                u.name.toLowerCase() === input.toLowerCase() || u.id === input
-            );
-            if (user) {
-                success = this.groupService.addMember(g.id, user.id);
-            }
-        }
-
+        const success = this.groupService.addMember(g.id, userId);
         if (success) {
-            this.messageService.add({ severity: 'success', summary: 'Miembro añadido', detail: `"${input}" fue agregado al grupo` });
-            this.addMemberInput.set('');
+            const userName = this.userService.getById(userId)?.name ?? userId;
+            this.messageService.add({ severity: 'success', summary: 'Miembro añadido', detail: `"${userName}" fue agregado al grupo` });
+            this.selectedUserId.set(null);
             this.refreshGroup(g.id);
         } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Usuario no encontrado o ya es miembro del grupo' });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo agregar el miembro' });
         }
     }
 

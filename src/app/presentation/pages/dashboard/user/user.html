@@ -15,7 +15,7 @@
     <!-- Users Table -->
     <p-card styleClass="table-card">
         <p-table [value]="users()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
-            [tableStyle]="{ 'min-width': '45rem' }" styleClass="p-datatable-sm" dataKey="id">
+            [tableStyle]="{ 'min-width': '55rem' }" styleClass="p-datatable-sm" dataKey="id">
 
             <ng-template #header>
                 <tr>
@@ -26,9 +26,10 @@
                     <th pSortableColumn="email">
                         Email <p-sortIcon field="email" />
                     </th>
-                    <th pSortableColumn="role" style="width: 160px;">
+                    <th pSortableColumn="role" style="width: 140px;">
                         Rol <p-sortIcon field="role" />
                     </th>
+                    <th style="width: 160px;">Grupo</th>
                     <th style="width: 110px; text-align: center;">Acciones</th>
                 </tr>
             </ng-template>
@@ -50,6 +51,9 @@
                     <td>
                         <p-tag [value]="user.role" [severity]="roleSeverity(user.role)" />
                     </td>
+                    <td>
+                        <span class="group-cell">{{ getUserGroupName(user.id) }}</span>
+                    </td>
                     <td style="text-align: center;">
                         <div class="row-actions">
                             <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
@@ -63,7 +67,7 @@
 
             <ng-template #empty>
                 <tr>
-                    <td colspan="5" class="empty-state">
+                    <td colspan="6" class="empty-state">
                         <span class="pi pi-users empty-icon"></span>
                         <p>No hay usuarios registrados. Crea el primero.</p>
                     </td>
@@ -75,7 +79,7 @@
 
 <!-- Create / Edit Dialog -->
 <p-dialog [(visible)]="dialogVisible" [header]="editingId() ? 'Editar Usuario' : 'Nuevo Usuario'" [modal]="true"
-    [style]="{ width: '440px' }" [closeOnEscape]="true" (onHide)="userForm.reset()">
+    [style]="{ width: '440px' }" [breakpoints]="{ '640px': '95vw' }" [closeOnEscape]="true" (onHide)="userForm.reset()">
 
     <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="dialog-form">
         <div class="dialog-fields">
@@ -100,10 +104,21 @@
 
             <div class="field">
                 <p-iftalabel>
-                    <p-select id="urole" formControlName="role" [options]="roles" placeholder=" " styleClass="w-full" />
+                    <p-select id="urole" formControlName="role" [options]="roles" placeholder=" " appendTo="body"
+                        styleClass="w-full" />
                     <label for="urole">Rol</label>
                 </p-iftalabel>
             </div>
+
+            @if (userForm.get('role')?.value !== 'Administrador') {
+            <div class="field">
+                <p-iftalabel>
+                    <p-select id="ugroup" formControlName="groupId" [options]="groupOptions()" optionLabel="label"
+                        optionValue="value" placeholder=" " appendTo="body" styleClass="w-full" />
+                    <label for="ugroup">Grupo</label>
+                </p-iftalabel>
+            </div>
+            }
         </div>
 
         <div class="dialog-footer">
