@@ -12,7 +12,9 @@ import { DatePipe } from '@angular/common';
 import { TicketService } from '../../../../application/services/ticket.service';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
+import { AuthService } from '../../../../application/services/auth.service';
 import { Ticket, TicketStatus, TicketPriority } from '../../../../core/models/ticket.model';
+import { PERMISSIONS } from '../../../../core/models/permission.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -65,11 +67,17 @@ export class TicketsPage implements OnInit {
     private groupService = inject(GroupService);
     private userService = inject(UserService);
     private messageService = inject(MessageService);
+    private authService = inject(AuthService);
     private confirmationService = inject(ConfirmationService);
     private fb = inject(FormBuilder);
     private route = inject(ActivatedRoute);
 
-    readonly tickets = this.ticketService.tickets;
+    groupId = signal<string>('');
+
+    readonly tickets = computed(() => {
+        return this.ticketService.ticketsByGroup(this.groupId());
+    });
+
     readonly groups = this.groupService.groups;
     readonly users = this.userService.users;
 
@@ -108,7 +116,7 @@ export class TicketsPage implements OnInit {
     ticketForm = this.fb.group({
         title: ['', [Validators.required, Validators.minLength(3)]],
         description: ['', Validators.required],
-        priority: [TicketPriority.Media as string, Validators.required],
+        priority: [TicketPriority.Zhong as string, Validators.required],
         assignedTo: ['', Validators.required],
         dueDate: [null as Date | null, Validators.required],
         groupId: ['', Validators.required],
@@ -116,6 +124,12 @@ export class TicketsPage implements OnInit {
     });
 
     ngOnInit(): void {
+        this.route.parent?.paramMap.subscribe(params => {
+            const id = params.get('groupId');
+            if (id) {
+                this.groupId.set(id);
+            }
+        });
         const statusParam = this.route.snapshot.queryParamMap.get('status');
         if (statusParam && this.statuses.includes(statusParam as TicketStatus)) {
             this.statusFilter.set(statusParam);
@@ -123,10 +137,27 @@ export class TicketsPage implements OnInit {
         }
     }
 
+    quickFilter = signal<string | null>(null);
+
     readonly filteredTickets = computed(() => {
+        let base = this.tickets();
+
+        // Quick Filters
+        const qf = this.quickFilter();
+        if (qf === 'mis-tickets') {
+            const user = this.authService?.currentUser(); // Note: authService injected below
+            if (user) base = base.filter(t => t.assignedTo === user.id);
+        } else if (qf === 'sin-asignar') {
+            base = base.filter(t => !t.assignedTo);
+        } else if (qf === 'prioridad-alta') {
+            base = base.filter(t => t.priority === TicketPriority.Gao || t.priority === TicketPriority.Jinji);
+        }
+
+        // Status Filter
         const filter = this.statusFilter();
-        if (!filter) return this.tickets();
-        return this.tickets().filter(t => t.status === filter);
+        if (filter) base = base.filter(t => t.status === filter);
+
+        return base;
     });
 
     ticketsByColumn(status: TicketStatus): Ticket[] {
@@ -144,12 +175,27 @@ export class TicketsPage implements OnInit {
     // Create / Edit
     openCreate(): void {
         this.editingId.set(null);
-        this.ticketForm.reset({ priority: TicketPriority.Media, status: TicketStatus.Pendiente });
+        this.ticketForm.enable();
+        this.ticketForm.reset({ priority: TicketPriority.Zhong, status: TicketStatus.Pendiente, groupId: this.groupId() });
         this.createDialogVisible.set(true);
     }
 
     openEdit(ticket: Ticket): void {
         this.editingId.set(ticket.id);
+        const user = this.authService.currentUser();
+        const isCreator = ticket.createdBy === user?.id;
+        const isAssigned = ticket.assignedTo === user?.id;
+        const isSuperAdmin = user && this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+
+        if (isCreator || isSuperAdmin) {
+            this.ticketForm.enable();
+        } else if (isAssigned) {
+            this.ticketForm.disable();
+            this.ticketForm.controls.status.enable();
+        } else {
+            this.ticketForm.disable();
+        }
+
         this.ticketForm.patchValue({
             title: ticket.title,
             description: ticket.description,
@@ -164,8 +210,10 @@ export class TicketsPage implements OnInit {
 
     saveTicket(): void {
         if (this.ticketForm.invalid) return;
-        const val = this.ticketForm.value;
+        const val = this.ticketForm.getRawValue(); // gets values even if disabled
         const id = this.editingId();
+        const user = this.authService.currentUser();
+        const userName = user?.name || 'Unknown';
 
         if (id) {
             this.ticketService.update(id, {
@@ -176,7 +224,7 @@ export class TicketsPage implements OnInit {
                 dueDate: val.dueDate!,
                 groupId: val.groupId!,
                 status: val.status! as TicketStatus,
-            }, 'Admin ERP');
+            }, userName);
             this.messageService.add({ severity: 'success', summary: 'Ticket actualizado', detail: `"${val.title}" actualizado` });
         } else {
             this.ticketService.create({
@@ -184,6 +232,7 @@ export class TicketsPage implements OnInit {
                 description: val.description!,
                 priority: val.priority! as TicketPriority,
                 assignedTo: val.assignedTo!,
+                createdBy: user?.id ?? '',
                 dueDate: val.dueDate!,
                 groupId: val.groupId!,
                 status: TicketStatus.Pendiente,
@@ -192,6 +241,18 @@ export class TicketsPage implements OnInit {
         }
         this.createDialogVisible.set(false);
         this.refreshDetail();
+    }
+
+    canEditCurrentTicket(ticket: Ticket): boolean {
+        const u = this.authService.currentUser();
+        if (!u) return false;
+        return ticket.createdBy === u.id || ticket.assignedTo === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+    }
+
+    canDeleteCurrentTicket(ticket: Ticket): boolean {
+        const u = this.authService.currentUser();
+        if (!u) return false;
+        return ticket.createdBy === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
     }
 
     confirmDelete(ticket: Ticket): void {
@@ -228,8 +289,9 @@ export class TicketsPage implements OnInit {
     addComment(): void {
         const ticket = this.selectedTicket();
         const comment = this.newComment().trim();
+        const userName = this.authService.currentUser()?.name || 'Unknown';
         if (!ticket || !comment) return;
-        this.ticketService.addComment(ticket.id, 'Admin ERP', comment);
+        this.ticketService.addComment(ticket.id, userName, comment);
         this.newComment.set('');
         this.refreshDetail();
     }
@@ -245,8 +307,20 @@ export class TicketsPage implements OnInit {
 
     onDrop(status: TicketStatus): void {
         const ticket = this.draggedTicket();
-        if (ticket && ticket.status !== status) {
-            this.ticketService.updateStatus(ticket.id, status, 'Admin ERP');
+        if (!ticket) return;
+
+        const u = this.authService.currentUser();
+        const canEdit = u && (ticket.createdBy === u.id || ticket.assignedTo === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS));
+
+        if (!canEdit) {
+            this.messageService.add({ severity: 'error', summary: 'Permiso denegado', detail: 'Solo el creador o asignado puede mover este ticket' });
+            this.draggedTicket.set(null);
+            return;
+        }
+
+        if (ticket.status !== status) {
+            const userName = u?.name || 'Unknown';
+            this.ticketService.updateStatus(ticket.id, status, userName);
             this.messageService.add({
                 severity: 'info',
                 summary: 'Estado cambiado',
@@ -269,8 +343,11 @@ export class TicketsPage implements OnInit {
 
     prioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
         const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
+            'Muy Baja': 'secondary',
             'Baja': 'secondary',
+            'Media Baja': 'info',
             'Media': 'info',
+            'Media Alta': 'warn',
             'Alta': 'warn',
             'Urgente': 'danger',
         };
@@ -289,5 +366,9 @@ export class TicketsPage implements OnInit {
 
     clearFilter(): void {
         this.statusFilter.set(null);
+    }
+
+    hasPermission(permission: string): boolean {
+        return this.authService.hasPermission(permission);
     }
 }

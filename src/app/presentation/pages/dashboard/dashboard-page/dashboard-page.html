@@ -8,7 +8,9 @@
                 <p class="hero-subtitle">Resumen de actividad y gestión de tickets del equipo</p>
             </div>
             <div class="hero-actions">
+                @if (hasPermission('ticket:create')) {
                 <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="goToTickets()" />
+                }
                 <p-button label="Ver todos" icon="pi pi-arrow-right" severity="secondary" [outlined]="true"
                     (onClick)="goToTickets()" />
             </div>
@@ -88,16 +90,16 @@
             </div>
         </div>
 
-        <!-- Right: Groups Overview -->
+        <!-- Right: Group Info -->
         <div class="content-col">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="pi pi-users"></span> Grupos
+                    <span class="pi pi-info-circle"></span> Información
                 </h3>
             </div>
             <div class="groups-list">
-                @for (group of groupSummary(); track group.id) {
-                <div class="group-card" (click)="goToGroup(group.id)">
+                @if (currentGroup(); as group) {
+                <div class="group-card">
                     <div class="group-card-left">
                         <div class="group-avatar">{{ group.name[0] }}</div>
                         <div class="group-card-info">
@@ -105,19 +107,9 @@
                             <span class="group-card-cat">{{ group.category }} · {{ group.level }}</span>
                         </div>
                     </div>
-                    <div class="group-card-stats">
-                        <div class="group-stat">
-                            <span class="group-stat-value">{{ group.memberIds.length }}</span>
-                            <span class="group-stat-label">Miembros</span>
-                        </div>
-                        <div class="group-stat">
-                            <span class="group-stat-value accent">{{ group.ticketCount }}</span>
-                            <span class="group-stat-label">Tickets</span>
-                        </div>
-                        <span class="pi pi-chevron-right group-arrow"></span>
-                    </div>
                 </div>
                 }
+
             </div>
         </div>
     </div>

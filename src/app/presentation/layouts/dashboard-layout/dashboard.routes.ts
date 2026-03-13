@@ -21,4 +21,8 @@ export const DASHBOARD_ROUTES: Routes = [
         path: 'user',
         loadComponent: () => import('../../pages/dashboard/user/user').then(m => m.User)
     },
+    {
+        path: 'profile',
+        loadComponent: () => import('../../pages/dashboard/user-profile-page/user-profile-page').then(m => m.UserProfilePage)
+    },
 ];

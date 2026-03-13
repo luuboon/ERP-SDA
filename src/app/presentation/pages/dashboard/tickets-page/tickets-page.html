@@ -17,15 +17,33 @@
         <div class="page-header-right">
             <p-selectButton [options]="viewOptions" [(ngModel)]="currentView" optionLabel="label" optionValue="value"
                 styleClass="view-toggle" />
-            <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+            @if (hasPermission('ticket:create')) {
+                <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+            }
         </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="quick-filters flex gap-2 mt-4 mb-6">
+        <p-button label="Todos" [outlined]="quickFilter() !== null"
+            [severity]="quickFilter() === null ? 'contrast' : 'secondary'" size="small"
+            (onClick)="quickFilter.set(null)" />
+        <p-button label="Mis tickets" [outlined]="quickFilter() !== 'mis-tickets'"
+            [severity]="quickFilter() === 'mis-tickets' ? 'contrast' : 'secondary'" size="small"
+            (onClick)="quickFilter.set('mis-tickets')" />
+        <p-button label="Sin asignar" [outlined]="quickFilter() !== 'sin-asignar'"
+            [severity]="quickFilter() === 'sin-asignar' ? 'contrast' : 'secondary'" size="small"
+            (onClick)="quickFilter.set('sin-asignar')" />
+        <p-button label="Prioridad alta" [outlined]="quickFilter() !== 'prioridad-alta'"
+            [severity]="quickFilter() === 'prioridad-alta' ? 'contrast' : 'secondary'" size="small"
+            (onClick)="quickFilter.set('prioridad-alta')" />
     </div>
 
     <!-- Kanban View -->
     @if (currentView() === 'kanban') {
     <div class="kanban-board">
         @for (col of kanbanColumns; track col) {
-        <div class="kanban-column" pDroppable (onDrop)="onDrop(col)">
+        <div class="kanban-column" pDroppable="tickets" (onDrop)="onDrop(col)">
             <div class="kanban-column-header">
                 <span class="kanban-column-dot" [style.background]="columnColor(col)"></span>
                 <span class="kanban-column-title">{{ col }}</span>
@@ -33,8 +51,8 @@
             </div>
             <div class="kanban-column-body">
                 @for (ticket of ticketsByColumn(col); track ticket.id) {
-                <div class="kanban-card" pDraggable (onDragStart)="onDragStart(ticket)" (onDragEnd)="onDragEnd()"
-                    (click)="openDetail(ticket)">
+                <div class="kanban-card" pDraggable="tickets" (onDragStart)="onDragStart(ticket)"
+                    (onDragEnd)="onDragEnd()" (click)="openDetail(ticket)">
                     <div class="kanban-card-top">
                         <span class="kanban-card-title">{{ ticket.title }}</span>
                     </div>
@@ -292,10 +310,14 @@
 
     <ng-template #footer>
         <div class="detail-footer">
+            @if (canEditCurrentTicket(ticket)) {
             <p-button label="Editar" icon="pi pi-pencil" severity="secondary" [outlined]="true"
                 (onClick)="openEdit(ticket); detailDialogVisible.set(false)" />
+            }
+            @if (canDeleteCurrentTicket(ticket)) {
             <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [outlined]="true"
                 (onClick)="confirmDelete(ticket)" />
+            }
         </div>
     </ng-template>
 </p-dialog>

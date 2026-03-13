@@ -6,10 +6,13 @@ export enum TicketStatus {
 }
 
 export enum TicketPriority {
-    Baja = 'Baja',
-    Media = 'Media',
-    Alta = 'Alta',
-    Urgente = 'Urgente',
+    Zuidi = 'Muy Baja',
+    Di = 'Baja',
+    Zhongdi = 'Media Baja',
+    Zhong = 'Media',
+    Zhonggao = 'Media Alta',
+    Gao = 'Alta',
+    Jinji = 'Urgente',
 }
 
 export interface TicketComment {
@@ -34,6 +37,7 @@ export interface Ticket {
     description: string;
     status: TicketStatus;
     assignedTo: string;
+    createdBy: string;
     priority: TicketPriority;
     createdAt: Date;
     dueDate: Date;

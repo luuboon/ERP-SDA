@@ -1,0 +1,65 @@
+<div class="selection-container">
+    <div class="selection-header">
+        <div
+            class="rounded-full bg-primary text-primary-contrast inline-flex justify-center items-center h-16 w-16 mb-4">
+            <i class="pi pi-th-large text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold mb-2">Selecciona tu Espacio de Trabajo</h1>
+        <p class="text-gray-500">¿En qué grupo deseas trabajar hoy?</p>
+    </div>
+
+    @if (userGroups().length === 0) {
+    <div class="flex flex-col items-center justify-center p-8 bg-surface-50 dark:bg-surface-800 rounded-xl mt-8">
+        <i class="pi pi-inbox text-4xl text-gray-400 mb-4"></i>
+        <h3 class="text-xl font-medium mb-2">No tienes grupos asignados</h3>
+        <p class="text-gray-500">Contacta a un administrador para que te agregue a un espacio de trabajo.</p>
+    </div>
+    } @else {
+    <div class="groups-grid">
+        @for (group of userGroups(); track group.id) {
+        <p-card
+            styleClass="group-card shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-transparent hover:border-primary"
+            (click)="selectGroup(group.id)">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-primary/10 text-primary w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i class="pi pi-folder text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-1">{{ group.name }}</h3>
+                            <span class="text-sm text-gray-500">{{ group.category }} • {{ group.level }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center -space-x-2">
+                        @for (member of getMembers(group.memberIds); track member.id; let i = $index) {
+                            @if (i < 5) {
+                                <div class="w-8 h-8 rounded-full border-2 border-white dark:border-surface-900 bg-primary/20 text-primary flex items-center justify-center text-xs font-bold" [pTooltip]="member.name" tooltipPosition="top">
+                                    {{ member.name[0] | uppercase }}
+                                </div>
+                            }
+                        }
+                        @if (group.memberIds.length > 5) {
+                            <div class="w-8 h-8 rounded-full border-2 border-white dark:border-surface-900 bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300 flex items-center justify-center text-xs font-bold" [pTooltip]="group.memberIds.length + ' miembros en total'" tooltipPosition="top">
+                                +{{ group.memberIds.length - 5 }}
+                            </div>
+                        }
+                        @if (group.memberIds.length === 0) {
+                            <span class="text-sm text-gray-500">Sin miembros</span>
+                        }
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-500">
+                        <i class="pi pi-ticket text-sm"></i>
+                        <span class="text-sm">{{ group.tickets }} tickets</span>
+                    </div>
+                </div>
+            </div>
+        </p-card>
+        }
+    </div>
+    }
+    
+</div>

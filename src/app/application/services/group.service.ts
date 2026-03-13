@@ -15,6 +15,7 @@ export class GroupService {
             author: 'Admin ERP',
             memberIds: [],
             tickets: 0,
+            status: 'active',
         },
         {
             id: 'g-design',
@@ -24,6 +25,7 @@ export class GroupService {
             author: 'Admin ERP',
             memberIds: [],
             tickets: 0,
+            status: 'active',
         },
         {
             id: 'g-sales',
@@ -33,6 +35,7 @@ export class GroupService {
             author: 'Admin ERP',
             memberIds: [],
             tickets: 0,
+            status: 'active',
         },
     ]);
 
@@ -42,8 +45,8 @@ export class GroupService {
         return this._groups().find(g => g.id === id);
     }
 
-    create(data: Omit<Group, 'id'>): void {
-        const newGroup: Group = { id: 'g-' + crypto.randomUUID().slice(0, 8), ...data };
+    create(data: Omit<Group, 'id' | 'status'>): void {
+        const newGroup: Group = { id: 'g-' + crypto.randomUUID().slice(0, 8), status: 'active', ...data };
         this._groups.update(list => [...list, newGroup]);
     }
 

@@ -6,7 +6,11 @@ export const routes: Routes = [
         loadComponent: () => import('./presentation/pages/landing/landing.component').then(m => m.LandingComponent)
     },
     {
-        path: 'dashboard',
+        path: 'group-selection',
+        loadComponent: () => import('./presentation/pages/dashboard/group-selection-page/group-selection-page').then(m => m.GroupSelectionPage)
+    },
+    {
+        path: 'dashboard/:groupId',
         loadComponent: () => import('./presentation/layouts/dashboard-layout/dashboard-layout').then(m => m.DashboardLayout),
         loadChildren: () => import('./presentation/layouts/dashboard-layout/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
     },

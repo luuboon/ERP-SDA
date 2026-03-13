@@ -3,13 +3,16 @@ import {
     Component,
     inject,
     computed,
+    signal,
+    OnInit
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TicketService } from '../../../../application/services/ticket.service';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
-import { TicketStatus, TicketPriority } from '../../../../core/models/ticket.model';
+import { TicketStatus, TicketPriority, Ticket } from '../../../../core/models/ticket.model';
+import { AuthService } from '../../../../application/services/auth.service';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -24,52 +27,69 @@ import { TooltipModule } from 'primeng/tooltip';
     templateUrl: './dashboard-page.html',
     styleUrl: './dashboard-page.css',
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
     private ticketService = inject(TicketService);
     private groupService = inject(GroupService);
     private userService = inject(UserService);
     private router = inject(Router);
+    private route = inject(ActivatedRoute);
+    private authService = inject(AuthService);
 
-    readonly totalTickets = computed(() => this.ticketService.tickets().length);
+    groupId = signal<string>('');
 
-    readonly statusCounts = this.ticketService.statusCounts;
+    ngOnInit() {
+        this.route.parent?.paramMap.subscribe(params => {
+            const id = params.get('groupId');
+            if (id) {
+                this.groupId.set(id);
+            }
+        });
+    }
+
+    readonly currentGroup = computed(() => {
+        return this.groupService.getById(this.groupId());
+    });
+
+    readonly groupTickets = computed(() => {
+        return this.ticketService.ticketsByGroup(this.groupId());
+    });
+
+    readonly totalTickets = computed(() => this.groupTickets().length);
 
     readonly completionRate = computed(() => {
         const total = this.totalTickets();
         if (total === 0) return 0;
-        const done = this.statusCounts()[TicketStatus.Finalizado];
+        const done = this.groupTickets().filter(t => t.status === TicketStatus.Finalizado).length;
         return Math.round((done / total) * 100);
     });
 
     readonly overdueCount = computed(() => {
         const now = new Date();
-        return this.ticketService.tickets().filter(
+        return this.groupTickets().filter(
             t => t.status !== TicketStatus.Finalizado && t.dueDate < now
         ).length;
     });
 
     readonly statusItems = computed(() => {
-        const counts = this.statusCounts();
-        const total = this.totalTickets();
+        const tickets = this.groupTickets();
+        const total = tickets.length;
+        const pending = tickets.filter(t => t.status === TicketStatus.Pendiente).length;
+        const inProgress = tickets.filter(t => t.status === TicketStatus.EnProgreso).length;
+        const review = tickets.filter(t => t.status === TicketStatus.Revision).length;
+        const done = tickets.filter(t => t.status === TicketStatus.Finalizado).length;
+
         return [
-            { label: 'Pendiente', count: counts[TicketStatus.Pendiente], icon: 'pi-clock', color: '#f59e0b', bg: '#fef3c7', status: TicketStatus.Pendiente, pct: total ? Math.round((counts[TicketStatus.Pendiente] / total) * 100) : 0 },
-            { label: 'En Progreso', count: counts[TicketStatus.EnProgreso], icon: 'pi-sync', color: '#3b82f6', bg: '#dbeafe', status: TicketStatus.EnProgreso, pct: total ? Math.round((counts[TicketStatus.EnProgreso] / total) * 100) : 0 },
-            { label: 'Revisión', count: counts[TicketStatus.Revision], icon: 'pi-eye', color: '#8b5cf6', bg: '#ede9fe', status: TicketStatus.Revision, pct: total ? Math.round((counts[TicketStatus.Revision] / total) * 100) : 0 },
-            { label: 'Finalizado', count: counts[TicketStatus.Finalizado], icon: 'pi-check-circle', color: '#10b981', bg: '#d1fae5', status: TicketStatus.Finalizado, pct: total ? Math.round((counts[TicketStatus.Finalizado] / total) * 100) : 0 },
+            { label: 'Pendiente', count: pending, icon: 'pi-clock', color: '#f59e0b', bg: '#fef3c7', status: TicketStatus.Pendiente, pct: total ? Math.round((pending / total) * 100) : 0 },
+            { label: 'En Progreso', count: inProgress, icon: 'pi-sync', color: '#3b82f6', bg: '#dbeafe', status: TicketStatus.EnProgreso, pct: total ? Math.round((inProgress / total) * 100) : 0 },
+            { label: 'Revisión', count: review, icon: 'pi-eye', color: '#8b5cf6', bg: '#ede9fe', status: TicketStatus.Revision, pct: total ? Math.round((review / total) * 100) : 0 },
+            { label: 'Finalizado', count: done, icon: 'pi-check-circle', color: '#10b981', bg: '#d1fae5', status: TicketStatus.Finalizado, pct: total ? Math.round((done / total) * 100) : 0 },
         ];
     });
 
     readonly recentTickets = computed(() => {
-        return [...this.ticketService.tickets()]
+        return [...this.groupTickets()]
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .slice(0, 5);
-    });
-
-    readonly groupSummary = computed(() => {
-        return this.groupService.groups().map(g => ({
-            ...g,
-            ticketCount: this.ticketService.ticketsByGroup(g.id).length,
-        }));
     });
 
     getUserName(userId: string): string {
@@ -77,15 +97,16 @@ export class DashboardPage {
     }
 
     goToTickets(status?: TicketStatus): void {
+        const id = this.groupId();
         if (status) {
-            this.router.navigate(['/dashboard/tickets'], { queryParams: { status } });
+            this.router.navigate(['/dashboard', id, 'tickets'], { queryParams: { status } });
         } else {
-            this.router.navigate(['/dashboard/tickets']);
+            this.router.navigate(['/dashboard', id, 'tickets']);
         }
     }
 
     goToGroup(groupId: string): void {
-        this.router.navigate(['/dashboard/group', groupId]);
+        this.router.navigate(['/dashboard', this.groupId(), 'group', groupId]);
     }
 
     statusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
@@ -97,8 +118,18 @@ export class DashboardPage {
 
     prioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
         const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-            'Baja': 'secondary', 'Media': 'info', 'Alta': 'warn', 'Urgente': 'danger',
+            'Muy Baja': 'secondary',
+            'Baja': 'secondary',
+            'Media Baja': 'info',
+            'Media': 'info',
+            'Media Alta': 'warn',
+            'Alta': 'warn',
+            'Urgente': 'danger',
         };
         return map[priority] ?? 'secondary';
+    }
+
+    hasPermission(permission: string): boolean {
+        return this.authService.hasPermission(permission);
     }
 }

@@ -1,27 +1,132 @@
-    :host ::ng-deep .grayscale-input {
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        color: #1e293b;
-        border-radius: 6px;
+.auth-page *,
+.auth-page *::before,
+.auth-page *::after {
+    box-sizing: border-box;
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem;
+}
+
+.auth-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+}
+
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 0.5rem;
     }
 
-    :host ::ng-deep .grayscale-password input {
-        width: 100%;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        color: #1e293b;
-        padding: 0.75rem;
-        border-radius: 6px;
+    .auth-card {
+        padding: 1.5rem 1.25rem;
     }
+}
 
-    :host ::ng-deep .grayscale-password {
-        width: 100%;
-    }
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
 
-    :host ::ng-deep .p-password {
-        width: 100%;
-    }
+.auth-logo {
+    font-size: 3rem;
+    color: #0f172a;
+    display: block;
+    margin-bottom: 1rem;
+}
 
-    :host ::ng-deep .p-select-label {
-        color: #1e293b;
-    }
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.auth-subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0.5rem 0 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    margin-left: 0.1rem;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    margin-left: 0.1rem;
+}
+
+:host ::ng-deep .auth-btn {
+    margin-top: 0.5rem;
+    height: 2.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    width: 100%;
+}
+
+:host ::ng-deep .p-password {
+    width: 100%;
+    display: block;
+}
+
+:host ::ng-deep .p-password>.p-inputtext,
+:host ::ng-deep .p-inputtext {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.auth-link {
+    color: #0f172a;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}

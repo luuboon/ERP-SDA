@@ -1,35 +1,54 @@
-<div class="auth-header">
-    <p-toast />
-    <h2>Bienvenido de Vuelta</h2>
-    <p>Inicia sesión para acceder a tu panel de ERP-Luu</p>
+<p-toast />
+
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="auth-logo pi pi-objects-column"></span>
+            <h1 class="auth-title">Bienvenido a ERP-Luu</h1>
+            <p class="auth-subtitle">Inicia sesión para acceder a tu panel</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+            <div class="field">
+                <label for="email" class="field-label">Correo electrónico</label>
+                <input pInputText id="email" formControlName="email" class="w-full" placeholder="ejemplo@empresa.com"
+                    [invalid]="loginForm.controls['email'].invalid && loginForm.controls['email'].touched" />
+                @if (loginForm.controls['email'].invalid && loginForm.controls['email'].touched) {
+                <small class="error-text">El correo es requerido y debe ser válido.</small>
+                }
+            </div>
+
+            <div class="field">
+                <label for="password" class="field-label">Contraseña</label>
+                <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
+                    styleClass="w-full" inputStyleClass="w-full" placeholder="Ingresa tu contraseña" />
+            </div>
+
+            <div class="form-options">
+                <div class="checkbox-container">
+                    <p-checkbox binary="true" inputId="remember"></p-checkbox>
+                    <label for="remember" class="checkbox-label">Recuérdame</label>
+                </div>
+                <a href="#" class="forgot-link" (click)="$event.preventDefault()">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <p-button label="Iniciar Sesión" icon="pi pi-sign-in" severity="contrast" type="submit"
+                [disabled]="loginForm.invalid" styleClass="w-full auth-btn" />
+        </form>
+
+        <div class="auth-footer">
+            <span>¿No tienes una cuenta?</span>
+            <a routerLink="/auth/register" class="auth-link">Regístrate</a>
+        </div>
+
+        <div class="auth-hint">
+            <p><strong>Cuentas de Acceso (Rúbrica):</strong></p>
+            <ul class="demo-users-list">
+                <li><strong>Super Admin:</strong> admin&#64;erp.com / admin123</li>
+                <li><strong>Gestor Grupos:</strong> ana&#64;erp.com / ana123</li>
+                <li><strong>Usuario Regular:</strong> carlos&#64;erp.com / carlos123</li>
+                <li><strong>Usuario Lector:</strong> miguel&#64;erp.com / miguel123</li>
+            </ul>
+        </div>
+    </div>
 </div>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form flex flex-col gap-6">
-
-    <div class="field">
-        <p-iftalabel>
-            <input pInputText id="username" formControlName="email"
-                [invalid]="loginForm.controls['email'].invalid && loginForm.controls['email'].touched"
-                autocomplete="off" class="w-full grayscale-input" />
-            <label for="username">Usuario / Correo Electrónico</label>
-        </p-iftalabel>
-    </div>
-
-    <div class="field flex flex-col">
-        <p-password id="password" formControlName="password" styleClass="w-full grayscale-password" [feedback]="false"
-            autocomplete="off" [toggleMask]="true">
-        </p-password>
-    </div>
-
-    <div class="field-checkbox flex items-center gap-2">
-        <p-checkbox formControlName="rememberMe" [binary]="true" inputId="remember"></p-checkbox>
-        <label for="remember" class="text-gray-600 text-sm">Recuérdame</label>
-    </div>
-
-    <p-button label="Iniciar Sesión" type="submit" severity="contrast" [disabled]="loginForm.invalid"
-        styleClass="w-full login-btn"></p-button>
-
-    <div class="auth-footer mt-4 text-center">
-        <p class="text-sm text-gray-500">¿No tienes una cuenta? <a routerLink="/auth/register"
-                class="font-semibold text-gray-900 hover-underline">Regístrate</a></p>
-    </div>
-</form>

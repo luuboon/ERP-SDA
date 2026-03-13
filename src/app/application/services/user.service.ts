@@ -1,32 +1,56 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { User } from '../../core/models/user.model';
+import { PERMISSION_PRESETS, PERMISSIONS } from '../../core/models/permission.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
     private _users = signal<User[]>([
         {
-            id: 'u-admin',
-            name: 'Admin ERP',
+            id: 'u-superadmin',
+            name: 'Super Admin',
             email: 'admin@erp.com',
-            role: 'Administrador',
-        },
-        {
-            id: 'u-ana',
-            name: 'Ana García',
-            email: 'ana.garcia@erp.com',
-            role: 'Analista',
+            password: 'admin123',
+            permissions: [...PERMISSION_PRESETS.SUPER_ADMIN],
         },
         {
             id: 'u-carlos',
             name: 'Carlos Méndez',
-            email: 'carlos.mendez@erp.com',
-            role: 'Soporte',
+            email: 'carlos@erp.com',
+            password: 'carlos123',
+            permissions: [
+                PERMISSIONS.TICKET_EDIT,
+                PERMISSIONS.TICKET_VIEW,
+            ],
+        },
+        {
+            id: 'u-ana',
+            name: 'Ana García',
+            email: 'ana@erp.com',
+            password: 'ana123',
+            permissions: [
+                PERMISSIONS.TICKET_CREATE, PERMISSIONS.TICKET_EDIT,
+                PERMISSIONS.TICKET_VIEW,
+                PERMISSIONS.GROUP_ADD, PERMISSIONS.GROUP_EDIT, PERMISSIONS.GROUP_DELETE,
+            ],
         },
         {
             id: 'u-laura',
             name: 'Laura Torres',
-            email: 'laura.torres@erp.com',
-            role: 'Viewer',
+            email: 'laura@erp.com',
+            password: 'laura123',
+            permissions: [
+                PERMISSIONS.TICKET_VIEW,
+                PERMISSIONS.TICKET_CREATE,
+            ],
+        },
+        {
+            id: 'u-miguel',
+            name: 'Miguel Ríos',
+            email: 'miguel@erp.com',
+            password: 'miguel123',
+            permissions: [
+                PERMISSIONS.TICKET_VIEW,
+            ],
         },
     ]);
 
@@ -48,11 +72,19 @@ export class UserService {
 
     update(id: string, changes: Partial<Omit<User, 'id'>>): void {
         this._users.update(list =>
-            list.map(u => (u.id === id ? { ...u, ...changes } : u))
+            list.map(u => u.id === id ? { ...u, ...changes } : u)
         );
     }
 
     delete(id: string): void {
         this._users.update(list => list.filter(u => u.id !== id));
+    }
+
+    /** Get a display label for a user's permission level */
+    getPermissionLabel(user: User): string {
+        if (user.permissions.length === Object.keys(PERMISSIONS).length) return 'Super Admin';
+        if (user.permissions.length >= 6) return 'Avanzado';
+        if (user.permissions.length >= 3) return 'Estándar';
+        return 'Básico';
     }
 }

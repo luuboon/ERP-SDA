@@ -9,7 +9,9 @@
             <h2 class="page-title">Groups</h2>
             <span class="page-count">{{ groups().length }} grupos</span>
         </div>
+        @if (canCreateGroup()) {
         <p-button label="Nuevo Grupo" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+        }
     </div>
 
     <!-- Groups Table -->
@@ -30,6 +32,9 @@
                         Nivel <p-sortIcon field="level" />
                     </th>
                     <th>Autor</th>
+                    <th pSortableColumn="status">
+                        Estado <p-sortIcon field="status" />
+                    </th>
                     <th style="width: 100px; text-align: center;">Miembros</th>
                     <th style="width: 100px; text-align: center;">Tickets</th>
                     <th style="width: 140px; text-align: center;">Acciones</th>
@@ -51,6 +56,9 @@
                         <p-tag [value]="group.level" [severity]="levelSeverity(group.level)" />
                     </td>
                     <td>{{ group.author }}</td>
+                    <td>
+                        <p-tag [value]="group.status === 'active' ? 'Activo' : 'Inactivo'" [severity]="statusSeverity(group.status)" />
+                    </td>
                     <td style="text-align: center;">
                         <span class="stat-badge">
                             <span class="pi pi-users stat-icon"></span>
@@ -67,10 +75,14 @@
                         <div class="row-actions">
                             <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true"
                                 pTooltip="Ver detalle" (onClick)="viewGroup(group)" />
+                            @if (canEditGroup()) {
                             <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
                                 pTooltip="Editar" (onClick)="openEdit(group)" />
+                            }
+                            @if (canDeleteGroup()) {
                             <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
                                 pTooltip="Eliminar" (onClick)="confirmDelete(group)" />
+                            }
                         </div>
                     </td>
                 </tr>
@@ -78,7 +90,7 @@
 
             <ng-template #empty>
                 <tr>
-                    <td colspan="8" class="empty-state">
+                    <td colspan="9" class="empty-state">
                         <span class="pi pi-users empty-icon"></span>
                         <p>No hay grupos registrados. Crea el primero.</p>
                     </td>
@@ -121,13 +133,22 @@
                 </div>
             </div>
 
-            <div class="field">
-                <p-iftalabel>
-                    <input pInputText id="gauthor" formControlName="author"
-                        [invalid]="groupForm.controls['author'].invalid && groupForm.controls['author'].touched"
-                        class="w-full" />
-                    <label for="gauthor">Autor</label>
-                </p-iftalabel>
+            <div class="field-row-2col">
+                <div class="field">
+                    <p-iftalabel>
+                        <input pInputText id="gauthor" formControlName="author"
+                            [invalid]="groupForm.controls['author'].invalid && groupForm.controls['author'].touched"
+                            class="w-full" />
+                        <label for="gauthor">Autor</label>
+                    </p-iftalabel>
+                </div>
+                <div class="field">
+                    <p-iftalabel>
+                        <p-select id="gstatus" formControlName="status" [options]="[{label: 'Activo', value: 'active'}, {label: 'Inactivo', value: 'inactive'}]" placeholder=" "
+                            styleClass="w-full" />
+                        <label for="gstatus">Estado</label>
+                    </p-iftalabel>
+                </div>
             </div>
         </div>
 

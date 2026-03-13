@@ -1,0 +1,105 @@
+<div class="profile-container">
+    @if (currentUser(); as user) {
+    <div class="profile-header">
+        <div class="profile-avatar text-6xl shadow-sm text-primary bg-primary/10">
+            {{ user.name[0] | uppercase }}
+        </div>
+        <div class="profile-info">
+            <h2 class="profile-name">{{ user.name }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+            <div class="profile-roles mt-2">
+                @for (perm of user.permissions; track perm) {
+                <p-tag [value]="perm" severity="info" styleClass="mr-1"></p-tag>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid mt-8">
+        <p-card styleClass="stat-card">
+            <div class="flex justify-between items-center w-full">
+                <div>
+                    <span class="block text-gray-500 mb-1">Total Asignados</span>
+                    <div class="text-3xl font-bold">{{ ticketStats().total }}</div>
+                </div>
+                <div
+                    class="w-12 h-12 bg-surface-100 dark:bg-surface-800 rounded-lg flex items-center justify-center text-xl text-gray-400">
+                    <i class="pi pi-ticket"></i>
+                </div>
+            </div>
+        </p-card>
+        <p-card styleClass="stat-card">
+            <div class="flex justify-between items-center w-full">
+                <div>
+                    <span class="block text-gray-500 mb-1">Pendientes</span>
+                    <div class="text-3xl font-bold">{{ ticketStats().pending }}</div>
+                </div>
+                <div
+                    class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg flex items-center justify-center text-xl text-yellow-600">
+                    <i class="pi pi-clock"></i>
+                </div>
+            </div>
+        </p-card>
+        <p-card styleClass="stat-card">
+            <div class="flex justify-between items-center w-full">
+                <div>
+                    <span class="block text-gray-500 mb-1">En Progreso</span>
+                    <div class="text-3xl font-bold">{{ ticketStats().progress }}</div>
+                </div>
+                <div
+                    class="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center text-xl text-blue-600">
+                    <i class="pi pi-sync"></i>
+                </div>
+            </div>
+        </p-card>
+        <p-card styleClass="stat-card">
+            <div class="flex justify-between items-center w-full">
+                <div>
+                    <span class="block text-gray-500 mb-1">Completados</span>
+                    <div class="text-3xl font-bold text-green-500">{{ ticketStats().done }}</div>
+                </div>
+                <div
+                    class="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-lg flex items-center justify-center text-xl text-green-600">
+                    <i class="pi pi-check"></i>
+                </div>
+            </div>
+        </p-card>
+    </div>
+
+    <div class="mt-8">
+        <h3 class="text-xl font-bold mb-4">Tickets Asignados a Mi</h3>
+        <p-card>
+            <p-table [value]="userTickets()" [paginator]="true" [rows]="5" styleClass="p-datatable-sm" dataKey="id"
+                [sortField]="'dueDate'">
+                <ng-template #header>
+                    <tr>
+                        <th>Título</th>
+                        <th style="width: 130px;">Estado</th>
+                        <th style="width: 110px;">Prioridad</th>
+                        <th style="width: 120px;">Fecha Límite</th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-ticket>
+                    <tr>
+                        <td class="font-medium">{{ ticket.title }}</td>
+                        <td><p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)"></p-tag></td>
+                        <td><p-tag [value]="ticket.priority" [severity]="prioritySeverity(ticket.priority)"></p-tag>
+                        </td>
+                        <td>{{ ticket.dueDate | date:'dd/MM/yyyy' }}</td>
+                    </tr>
+                </ng-template>
+                <ng-template #empty>
+                    <tr>
+                        <td colspan="4" class="text-center p-8 text-gray-500">
+                            <i class="pi pi-check-circle text-4xl mb-2 text-green-500 block"></i>
+                            No tienes tickets asignados
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-card>
+    </div>
+    } @else {
+    <div class="text-center p-8">Usuario no encontrado</div>
+    }
+</div>

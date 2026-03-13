@@ -6,4 +6,5 @@ export interface Group {
     author: string;
     memberIds: string[];
     tickets: number;
+    status: 'active' | 'inactive';
 }

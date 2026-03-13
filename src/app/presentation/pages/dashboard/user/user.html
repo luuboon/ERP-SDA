@@ -6,31 +6,27 @@
     <!-- Page Header -->
     <div class="page-header">
         <div class="page-header-left">
-            <h2 class="page-title">Users</h2>
+            <h2 class="page-title">Usuarios</h2>
             <span class="page-count">{{ users().length }} usuarios</span>
         </div>
+        @if (canCreateUser()) {
         <p-button label="Nuevo Usuario" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
+        }
     </div>
 
     <!-- Users Table -->
     <p-card styleClass="table-card">
         <p-table [value]="users()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
-            [tableStyle]="{ 'min-width': '55rem' }" styleClass="p-datatable-sm" dataKey="id">
+            [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm" dataKey="id">
 
             <ng-template #header>
                 <tr>
                     <th style="width: 100px">ID</th>
-                    <th pSortableColumn="name">
-                        Nombre <p-sortIcon field="name" />
-                    </th>
-                    <th pSortableColumn="email">
-                        Email <p-sortIcon field="email" />
-                    </th>
-                    <th pSortableColumn="role" style="width: 140px;">
-                        Rol <p-sortIcon field="role" />
-                    </th>
+                    <th pSortableColumn="name">Nombre <p-sortIcon field="name" /></th>
+                    <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
+                    <th style="width: 120px;">Nivel</th>
                     <th style="width: 160px;">Grupo</th>
-                    <th style="width: 110px; text-align: center;">Acciones</th>
+                    <th style="width: 140px; text-align: center;">Acciones</th>
                 </tr>
             </ng-template>
 
@@ -49,17 +45,25 @@
                     </td>
                     <td class="email-cell">{{ user.email }}</td>
                     <td>
-                        <p-tag [value]="user.role" [severity]="roleSeverity(user.role)" />
+                        <p-tag [value]="getPermissionLabel(user)" [severity]="permLevelSeverity(user)" />
                     </td>
                     <td>
                         <span class="group-cell">{{ getUserGroupName(user.id) }}</span>
                     </td>
                     <td style="text-align: center;">
                         <div class="row-actions">
+                            @if (canManagePermissions()) {
+                            <p-button icon="pi pi-shield" severity="info" [text]="true" [rounded]="true"
+                                pTooltip="Permisos" (onClick)="openPermissions(user)" />
+                            }
+                            @if (canEditUser()) {
                             <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
                                 pTooltip="Editar" (onClick)="openEdit(user)" />
+                            }
+                            @if (canDeleteUser()) {
                             <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
                                 pTooltip="Eliminar" (onClick)="confirmDelete(user)" />
+                            }
                         </div>
                     </td>
                 </tr>
@@ -104,13 +108,12 @@
 
             <div class="field">
                 <p-iftalabel>
-                    <p-select id="urole" formControlName="role" [options]="roles" placeholder=" " appendTo="body"
-                        styleClass="w-full" />
-                    <label for="urole">Rol</label>
+                    <p-password id="upassword" formControlName="password" [toggleMask]="true" [feedback]="false"
+                        styleClass="w-full" inputStyleClass="w-full" />
+                    <label for="upassword">Contraseña</label>
                 </p-iftalabel>
             </div>
 
-            @if (userForm.get('role')?.value !== 'Administrador') {
             <div class="field">
                 <p-iftalabel>
                     <p-select id="ugroup" formControlName="groupId" [options]="groupOptions()" optionLabel="label"
@@ -118,7 +121,6 @@
                     <label for="ugroup">Grupo</label>
                 </p-iftalabel>
             </div>
-            }
         </div>
 
         <div class="dialog-footer">
@@ -129,3 +131,32 @@
         </div>
     </form>
 </p-dialog>
+
+<!-- Permissions Dialog -->
+@if (editingPermUser(); as permUser) {
+<p-dialog [(visible)]="permDialogVisible" header="Permisos de {{ permUser.name }}" [modal]="true"
+    [style]="{ width: '520px' }" [breakpoints]="{ '640px': '95vw' }" [closeOnEscape]="true">
+
+    <div class="perm-dialog-body">
+        <p class="perm-hint">Selecciona los permisos para este usuario:</p>
+
+        <div class="perm-grid">
+            @for (perm of allPermissions; track perm) {
+            <div class="perm-item" (click)="togglePermission(perm)">
+                <p-checkbox [binary]="true" [ngModel]="editingPermissions().includes(perm)"
+                    (ngModelChange)="togglePermission(perm)" />
+                <span class="perm-label">{{ formatPermission(perm) }}</span>
+            </div>
+            }
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <div class="dialog-footer">
+            <p-button label="Cancelar" severity="secondary" [outlined]="true"
+                (onClick)="permDialogVisible.set(false)" />
+            <p-button label="Guardar permisos" icon="pi pi-shield" severity="contrast" (onClick)="savePermissions()" />
+        </div>
+    </ng-template>
+</p-dialog>
+}

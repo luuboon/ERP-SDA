@@ -5,30 +5,127 @@
 * **Framework:** Angular 20+ (Standalone & Zoneless)
 * **Librería UI:** PrimeNG 21+ (con PrimeUIX)
 
+---
+
 ## Aprendizajes Clave de Configuración
 
 ### 1. Angular 20 es "Zoneless" por defecto
-Al crear un proyecto nuevo con Angular 20, este ya no incluye ni instala la librería `zone.js`. 
-* **El problema:** Si se intenta configurar la aplicación con `provideZoneChangeDetection()`, la app colapsará en el navegador mostrando una pantalla completamente en blanco y un error `NG0908` en la consola.
-* **La solución:** Se debe utilizar obligatoriamente `provideZonelessChangeDetection()` en el archivo `app.config.ts`.
+* **El problema:** Configurar con `provideZoneChangeDetection()` colapsa la app con error `NG0908`.
+* **La solución:** Usar `provideZonelessChangeDetection()` en `app.config.ts`.
 
-### 2. El nuevo motor de Temas de PrimeNG
-A partir de las versiones recientes (18+), PrimeNG eliminó los archivos CSS estáticos para los temas.
-* **El problema:** Importar rutas como `@import "primeng/resources/themes/lara-light-blue/theme.css";` en el archivo `styles.css` lanzará errores de compilación indicando que el módulo no existe.
-* **La solución:** 1. Instalar el paquete independiente de temas: `pnpm add @primeuix/themes`.
-    2. Configurar el tema a nivel de inyección de dependencias en `app.config.ts` usando `providePrimeNG({ theme: { preset: Lara } })`.
+### 2. El nuevo motor de temas de PrimeNG (v18+)
+* **El problema:** Importar `@import "primeng/resources/themes/..."` en `styles.css` lanza errores de compilación.
+* **La solución:** Instalar `@primeuix/themes` y configurar vía `providePrimeNG({ theme: { preset: Lara } })` en `app.config.ts`.
 
 ### 3. Animaciones en PrimeNG
-Aunque el IDE pueda marcar `provideAnimationsAsync()` como obsoleto (deprecated) debido a la transición de Angular hacia animaciones CSS nativas, **PrimeNG lo sigue necesitando** para que funcionen sus efectos visuales internos (como el efecto *ripple* al hacer clic en un botón). Debe mantenerse en los `providers` de `app.config.ts`.
+* `provideAnimationsAsync()` sigue siendo requerido para efectos visuales de PrimeNG (ripple, overlays). Aunque el IDE lo marque como deprecated, no eliminarlo.
 
-### 4. Componentes Standalone (Independientes)
-Dado que Angular ahora utiliza componentes *standalone*, el HTML no reconocerá ninguna etiqueta de PrimeNG (como `<p-button>`) mágicamente.
-* **La regla de oro:** Por cada componente de PrimeNG que se use en la vista (`app.html`), se debe importar explícitamente su módulo correspondiente (ej. `ButtonModule`) en el arreglo `imports: []` del archivo TypeScript del componente (`app.ts`). De lo contrario, el compilador lanzará el error `NG8001: is not a known element`.
+### 4. Componentes Standalone — Regla de Oro
+* Cada componente de PrimeNG usado en el template **debe importarse explícitamente** en el array `imports: []` del componente TypeScript. Error si no: `NG8001: is not a known element`.
+
+### 5. Layouts y Doble Anidamiento (Double Nesting)
+* **El problema:** Renderizados extraños o estiramientos extremos (ej. `min-height: 100vh` en componentes anidados) causados por envolver componentes de página (ej. `LoginComponent`) dentro de contenedores de layout (`AuthLayoutComponent`) que también definen sus propias tarjetas (`.auth-card`) o alturas máximas.
+* **La solución:** El contenedor de Layout debe proporcionar limpiamente el `<router-outlet></router-outlet>`. La responsabilidad de crear el contenedor visual recae en el componente de la página, o si el Layout define la envoltura estructural, la página hija no debe recrearla ni forzar tamaños absolutos.
+
+---
+
+## Best Practices Aplicadas (Audit 2026-02-27)
+
+### Angular 20 + Zoneless
+| Práctica | Estado |
+|---|---|
+| `provideZonelessChangeDetection()` | ✅ Aplicado |
+| Todos los componentes `standalone: true` | ✅ Aplicado |
+| Lazy loading con `loadComponent` en todas las rutas | ✅ Aplicado |
+| `ChangeDetectionStrategy.OnPush` en todos los componentes | ✅ Aplicado |
+| Estado reactivo con `signal<T>()` en lugar de propiedades mutables | ✅ Aplicado en DashboardLayout |
+| Control flow moderno (`@if`, `@for`, `@empty`) en templates | ✅ Usado en dashboard nav |
+| `CommonModule` eliminado (built-in en Angular 17+) | ✅ Removido de Group |
+| `inject()` para inyección de dependencias (vs. constructor params) | ✅ En login |
+
+### PrimeNG v21
+| Práctica | Estado |
+|---|---|
+| Tema configurado con `@primeuix/themes` (Lara preset) | ✅ |
+| `provideAnimationsAsync()` incluido para ripple/overlays | ✅ |
+| Notificaciones con `MessageService` + `<p-toast>` | ✅ En login |
+| Cada componente PrimeNG importado explícitamente | ✅ |
+
+### Pendientes Documentados
+| Item | Decisión |
+|---|---|
+| `styles.css` tiene 391 líneas de utilidades Tailwind-like | Mantener por ahora, usar clases semánticas en nuevos componentes |
+| Convención de nombres `Group`/`User` sin sufijo | Convención del proyecto (no es un error) |
+
+---
+
+## Patrón de Notificaciones (UI)
+
+El patrón de feedback al usuario es: **PrimeNG `MessageService` + `<p-toast />`**
+
+```typescript
+// En el componente:
+providers: [MessageService]
+private messageService = inject(MessageService);
+
+// Éxito:
+this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Operación completada' });
+// Error:
+this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error' });
+```
+
+```html
+<!-- En el template, primera línea: -->
+<p-toast />
+```
+
+---
+
+## Patrón de Formularios Reactivos
+
+Usar `ReactiveFormsModule` + `FormBuilder` + `Validators`. Formularios siempre con:
+- `FormBuilder` inyectado con `inject(FormBuilder)`
+- Validaciones inline con `Validators`
+- Bindings con `formGroup` + `formControlName`
+- Botón submit deshabilitado si `form.invalid`
+
+---
+
+## Arquitectura de Capas
+
+```
+src/app/
+├── core/
+│   └── models/         ← Interfaces/Modelos de dominio (User, Group)
+├── application/
+│   └── services/       ← Servicios de aplicación con signals (UserService, GroupService)
+└── presentation/
+    ├── layouts/         ← DashboardLayout, AuthLayout
+    └── pages/
+        ├── auth/        ← Login, Register
+        └── dashboard/   ← User, Group
+```
+
+### Convención de servicios (con Signals)
+```typescript
+@Injectable({ providedIn: 'root' })
+export class GroupService {
+  // Estado reactivo
+  private _groups = signal<Group[]>([]);
+  readonly groups = this._groups.asReadonly();
+
+  // Operaciones CRUD con notificación via MessageService
+  create(group: Omit<Group, 'id'>): void { ... }
+  update(id: string, changes: Partial<Group>): void { ... }
+  delete(id: string): void { ... }
+}
+```
+
+---
 
 ## Archivo Base de Configuración (`src/app/app.config.ts`)
-Para referencia rápida, así debe lucir un arranque limpio:
 
-\`\`\`typescript
+```typescript
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -38,12 +135,12 @@ import Lara from '@primeuix/themes/lara';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZonelessChangeDetection(), 
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),
     providePrimeNG({
-      theme: { preset: Lara }
+      theme: { preset: Lara, options: { darkModeSelector: '.app-dark' } }
     })
   ]
 };
-\`\`\`
+```

@@ -16,7 +16,7 @@
             <p class="nav-section-label">Módulos</p>
             @for (item of navItems(); track item.route) {
             <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: false }">
+                [routerLinkActiveOptions]="{ exact: item.exact || false }">
                 <span class="nav-item-icon" [class]="item.icon"></span>
                 <span class="nav-item-label">{{ item.label }}</span>
             </a>
@@ -24,6 +24,19 @@
         </nav>
 
         <div class="sidebar-footer">
+            @if (currentUser(); as user) {
+            <div class="sidebar-user">
+                <span class="sidebar-user-avatar">{{ user.name[0] }}</span>
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name">{{ user.name }}</span>
+                    <span class="sidebar-user-email">{{ user.email }}</span>
+                </div>
+            </div>
+            <a class="nav-item logout-item" (click)="logout()">
+                <span class="nav-item-icon pi pi-sign-out"></span>
+                <span class="nav-item-label">Cerrar sesión</span>
+            </a>
+            }
             <span class="sidebar-version">v 1.0.0</span>
         </div>
     </aside>
@@ -39,9 +52,13 @@
                 </div>
             </div>
             <div class="main-header-right">
-                <div class="header-avatar">
+                <a class="header-avatar" [routerLink]="['/dashboard', groupId(), 'profile']">
+                    @if (currentUser(); as user) {
+                    <span class="avatar-text">{{ user.name[0] }}</span>
+                    } @else {
                     <span class="pi pi-user avatar-icon"></span>
-                </div>
+                    }
+                </a>
             </div>
         </header>
 

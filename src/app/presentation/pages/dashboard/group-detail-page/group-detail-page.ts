@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
 import { TicketService } from '../../../../application/services/ticket.service';
+import { AuthService } from '../../../../application/services/auth.service';
 import { Group } from '../../../../core/models/group.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -53,6 +54,7 @@ export class GroupDetailPage implements OnInit {
     private ticketService = inject(TicketService);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
+    private authService = inject(AuthService);
 
     group = signal<Group | null>(null);
     selectedUserId = signal<string | null>(null);
@@ -94,7 +96,7 @@ export class GroupDetailPage implements OnInit {
     }
 
     goBack(): void {
-        this.router.navigate(['/dashboard/group']);
+        this.router.navigate(['..'], { relativeTo: this.route });
     }
 
     addMember(): void {
@@ -133,7 +135,7 @@ export class GroupDetailPage implements OnInit {
     }
 
     goToTicket(ticketId: string): void {
-        this.router.navigate(['/dashboard/tickets'], { queryParams: { ticket: ticketId } });
+        this.router.navigate(['../../tickets'], { relativeTo: this.route, queryParams: { ticket: ticketId } });
     }
 
     statusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
@@ -148,9 +150,9 @@ export class GroupDetailPage implements OnInit {
 
     prioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
         const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-            'Baja': 'secondary',
-            'Media': 'info',
-            'Alta': 'warn',
+            'Muy Baja': 'secondary', 'Baja': 'secondary',
+            'Media Baja': 'info', 'Media': 'info',
+            'Media Alta': 'warn', 'Alta': 'warn',
             'Urgente': 'danger',
         };
         return map[priority] ?? 'secondary';
@@ -158,5 +160,13 @@ export class GroupDetailPage implements OnInit {
 
     getUserName(userId: string): string {
         return this.userService.getById(userId)?.name ?? userId;
+    }
+
+    getPermissionLabel(user: { permissions: string[] }): string {
+        return this.userService.getPermissionLabel(user as any);
+    }
+
+    hasPermission(permission: string): boolean {
+        return this.authService.hasPermission(permission);
     }
 }

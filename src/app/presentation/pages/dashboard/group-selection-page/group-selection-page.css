@@ -1,0 +1,20 @@
+.selection-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.selection-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+::ng-deep .group-card .p-card-body {
+    padding: 1.5rem;
+}
