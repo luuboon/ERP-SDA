@@ -29,7 +29,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { SelectButtonModule } from 'primeng/selectbutton';
+import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TimelineModule } from 'primeng/timeline';
 import { DragDropModule } from 'primeng/dragdrop';
 
@@ -54,7 +54,7 @@ import { DragDropModule } from 'primeng/dragdrop';
         ConfirmDialogModule,
         TagModule,
         TooltipModule,
-        SelectButtonModule,
+        ToggleButtonModule,
         TimelineModule,
         DragDropModule,
     ],
@@ -74,8 +74,22 @@ export class TicketsPage implements OnInit {
 
     groupId = signal<string>('');
 
+    readonly isSuperAdmin = computed(() =>
+        this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS)
+    );
+
     readonly tickets = computed(() => {
-        return this.ticketService.ticketsByGroup(this.groupId());
+        if (this.isSuperAdmin()) {
+            return this.ticketService.tickets();
+        }
+        const gId = this.groupId();
+        const user = this.authService.currentUser();
+        const groupTickets = this.ticketService.ticketsByGroup(gId);
+        if (!user) return groupTickets;
+        // Include tickets from other groups that are assigned to this user
+        const assignedFromOtherGroups = this.ticketService.tickets()
+            .filter(t => t.assignedTo === user.id && t.groupId !== gId);
+        return [...groupTickets, ...assignedFromOtherGroups];
     });
 
     readonly groups = this.groupService.groups;
@@ -85,12 +99,7 @@ export class TicketsPage implements OnInit {
     readonly priorities = Object.values(TicketPriority);
     readonly kanbanColumns = [TicketStatus.Pendiente, TicketStatus.EnProgreso, TicketStatus.Revision, TicketStatus.Finalizado];
 
-    readonly viewOptions = [
-        { label: 'Kanban', value: 'kanban', icon: 'pi pi-th-large' },
-        { label: 'Lista', value: 'list', icon: 'pi pi-list' },
-    ];
-
-    currentView = signal<string>('kanban');
+    isListView = signal(false);
     statusFilter = signal<string | null>(null);
 
     // Dialogs
@@ -116,14 +125,26 @@ export class TicketsPage implements OnInit {
     ticketForm = this.fb.group({
         title: ['', [Validators.required, Validators.minLength(3)]],
         description: ['', Validators.required],
-        priority: [TicketPriority.Zhong as string, Validators.required],
-        assignedTo: ['', Validators.required],
+        priority: [TicketPriority.Media as string, Validators.required],
+        assignedTo: [''],
         dueDate: [null as Date | null, Validators.required],
         groupId: ['', Validators.required],
         status: [TicketStatus.Pendiente as string],
     });
 
     ngOnInit(): void {
+        this.ticketForm.get('assignedTo')?.valueChanges.subscribe(userId => {
+            if (userId) {
+                const userGroups = this.groups().filter(g => g.memberIds.includes(userId));
+                if (userGroups.length > 0) {
+                    const currentGroupId = this.ticketForm.get('groupId')?.value;
+                    const isUserInCurrentGroup = userGroups.some(g => g.id === currentGroupId);
+                    if (!this.editingId() || !isUserInCurrentGroup) {
+                        this.ticketForm.get('groupId')?.setValue(userGroups[0].id);
+                    }
+                }
+            }
+        });
         this.route.parent?.paramMap.subscribe(params => {
             const id = params.get('groupId');
             if (id) {
@@ -133,7 +154,7 @@ export class TicketsPage implements OnInit {
         const statusParam = this.route.snapshot.queryParamMap.get('status');
         if (statusParam && this.statuses.includes(statusParam as TicketStatus)) {
             this.statusFilter.set(statusParam);
-            this.currentView.set('list');
+            this.isListView.set(true);
         }
     }
 
@@ -150,7 +171,7 @@ export class TicketsPage implements OnInit {
         } else if (qf === 'sin-asignar') {
             base = base.filter(t => !t.assignedTo);
         } else if (qf === 'prioridad-alta') {
-            base = base.filter(t => t.priority === TicketPriority.Gao || t.priority === TicketPriority.Jinji);
+            base = base.filter(t => t.priority === TicketPriority.Alta || t.priority === TicketPriority.Urgente);
         }
 
         // Status Filter
@@ -161,7 +182,7 @@ export class TicketsPage implements OnInit {
     });
 
     ticketsByColumn(status: TicketStatus): Ticket[] {
-        return this.tickets().filter(t => t.status === status);
+        return this.filteredTickets().filter(t => t.status === status);
     }
 
     getUserName(userId: string): string {
@@ -176,7 +197,7 @@ export class TicketsPage implements OnInit {
     openCreate(): void {
         this.editingId.set(null);
         this.ticketForm.enable();
-        this.ticketForm.reset({ priority: TicketPriority.Zhong, status: TicketStatus.Pendiente, groupId: this.groupId() });
+        this.ticketForm.reset({ priority: TicketPriority.Media, status: TicketStatus.Pendiente, groupId: this.groupId() });
         this.createDialogVisible.set(true);
     }
 
@@ -220,7 +241,7 @@ export class TicketsPage implements OnInit {
                 title: val.title!,
                 description: val.description!,
                 priority: val.priority! as TicketPriority,
-                assignedTo: val.assignedTo!,
+                assignedTo: val.assignedTo || '',
                 dueDate: val.dueDate!,
                 groupId: val.groupId!,
                 status: val.status! as TicketStatus,
@@ -231,7 +252,7 @@ export class TicketsPage implements OnInit {
                 title: val.title!,
                 description: val.description!,
                 priority: val.priority! as TicketPriority,
-                assignedTo: val.assignedTo!,
+                assignedTo: val.assignedTo || '',
                 createdBy: user?.id ?? '',
                 dueDate: val.dueDate!,
                 groupId: val.groupId!,
@@ -343,11 +364,8 @@ export class TicketsPage implements OnInit {
 
     prioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
         const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-            'Muy Baja': 'secondary',
             'Baja': 'secondary',
-            'Media Baja': 'info',
             'Media': 'info',
-            'Media Alta': 'warn',
             'Alta': 'warn',
             'Urgente': 'danger',
         };

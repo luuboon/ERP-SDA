@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { GroupService } from '../../../../application/services/group.service';
 import { AuthService } from '../../../../application/services/auth.service';
 import { UserService } from '../../../../application/services/user.service';
+import { TicketService } from '../../../../application/services/ticket.service';
 import { User } from '../../../../core/models/user.model';
 import { PERMISSIONS } from '../../../../core/models/permission.model';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ export class GroupSelectionPage {
     private groupService = inject(GroupService);
     private authService = inject(AuthService);
     private userService = inject(UserService);
+    private ticketService = inject(TicketService);
     private router = inject(Router);
 
     readonly userGroups = computed(() => {
@@ -46,5 +48,9 @@ export class GroupSelectionPage {
         return memberIds
             .map(id => this.userService.getById(id))
             .filter((u): u is User => u !== undefined);
+    }
+
+    getTicketCount(groupId: string): number {
+        return this.ticketService.ticketsByGroup(groupId).length;
     }
 }

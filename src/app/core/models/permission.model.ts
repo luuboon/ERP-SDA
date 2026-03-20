@@ -33,16 +33,7 @@ export function hasPermission(permissions: string[], permission: string): boolea
     return permissions.includes(permission);
 }
 
-/** Predefined permission sets for convenience */
-export const PERMISSION_PRESETS = {
-    SUPER_ADMIN: [...ALL_PERMISSIONS],
-    STANDARD: [
-        PERMISSIONS.TICKET_CREATE,
-        PERMISSIONS.TICKET_EDIT,
-        PERMISSIONS.TICKET_VIEW,
-        PERMISSIONS.GROUP_ADD,
-    ],
-    VIEWER: [
-        PERMISSIONS.TICKET_VIEW,
-    ],
-} as const;
+/** Returns true if the user has every permission in the system */
+export function hasAllPermissions(permissions: string[]): boolean {
+    return ALL_PERMISSIONS.every(p => permissions.includes(p));
+}

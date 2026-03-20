@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { User } from '../../core/models/user.model';
-import { PERMISSION_PRESETS, PERMISSIONS } from '../../core/models/permission.model';
+import { ALL_PERMISSIONS, hasAllPermissions, PERMISSIONS } from '../../core/models/permission.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -10,7 +10,7 @@ export class UserService {
             name: 'Super Admin',
             email: 'admin@erp.com',
             password: 'admin123',
-            permissions: [...PERMISSION_PRESETS.SUPER_ADMIN],
+            permissions: [...ALL_PERMISSIONS],
         },
         {
             id: 'u-carlos',
@@ -80,9 +80,14 @@ export class UserService {
         this._users.update(list => list.filter(u => u.id !== id));
     }
 
+    /** Grant every available permission to a user */
+    grantAllPermissions(userId: string): void {
+        this.update(userId, { permissions: [...ALL_PERMISSIONS] });
+    }
+
     /** Get a display label for a user's permission level */
     getPermissionLabel(user: User): string {
-        if (user.permissions.length === Object.keys(PERMISSIONS).length) return 'Super Admin';
+        if (hasAllPermissions(user.permissions)) return 'Acceso total';
         if (user.permissions.length >= 6) return 'Avanzado';
         if (user.permissions.length >= 3) return 'Estándar';
         return 'Básico';

@@ -15,7 +15,8 @@
             }
         </div>
         <div class="page-header-right">
-            <p-selectButton [options]="viewOptions" [(ngModel)]="currentView" optionLabel="label" optionValue="value"
+            <p-toggleButton [ngModel]="isListView()" (ngModelChange)="isListView.set($event)"
+                onLabel="Lista" offLabel="Kanban" onIcon="pi pi-list" offIcon="pi pi-th-large"
                 styleClass="view-toggle" />
             @if (hasPermission('ticket:create')) {
                 <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
@@ -40,7 +41,7 @@
     </div>
 
     <!-- Kanban View -->
-    @if (currentView() === 'kanban') {
+    @if (!isListView()) {
     <div class="kanban-board">
         @for (col of kanbanColumns; track col) {
         <div class="kanban-column" pDroppable="tickets" (onDrop)="onDrop(col)">
@@ -81,7 +82,7 @@
     }
 
     <!-- List View -->
-    @if (currentView() === 'list') {
+    @if (isListView()) {
     <p-card styleClass="table-card">
         <p-table [value]="filteredTickets()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 25]"
             [tableStyle]="{ 'min-width': '65rem' }" styleClass="p-datatable-sm" dataKey="id" [sortField]="'createdAt'"
@@ -176,8 +177,8 @@
                     <p-iftalabel>
                         <p-select id="tassigned" formControlName="assignedTo" [options]="userOptions()"
                             optionLabel="label" optionValue="value" placeholder=" " appendTo="body"
-                            styleClass="w-full" />
-                        <label for="tassigned">Asignado a</label>
+                            [showClear]="true" styleClass="w-full" />
+                        <label for="tassigned">Asignado a (Opcional)</label>
                     </p-iftalabel>
                 </div>
             </div>

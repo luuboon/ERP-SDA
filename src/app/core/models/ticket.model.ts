@@ -6,13 +6,10 @@ export enum TicketStatus {
 }
 
 export enum TicketPriority {
-    Zuidi = 'Muy Baja',
-    Di = 'Baja',
-    Zhongdi = 'Media Baja',
-    Zhong = 'Media',
-    Zhonggao = 'Media Alta',
-    Gao = 'Alta',
-    Jinji = 'Urgente',
+    Baja = 'Baja',
+    Media = 'Media',
+    Alta = 'Alta',
+    Urgente = 'Urgente',
 }
 
 export interface TicketComment {
