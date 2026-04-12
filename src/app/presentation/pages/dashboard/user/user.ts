@@ -87,6 +87,8 @@ export class User {
   openCreate(): void {
     this.editingId.set(null);
     this.userForm.reset();
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(4)]);
+    this.userForm.get('password')?.updateValueAndValidity();
     this.dialogVisible.set(true);
   }
 
@@ -96,9 +98,12 @@ export class User {
     this.userForm.patchValue({
       name: user.name,
       email: user.email,
-      password: user.password,
+      password: '', // Optional for existing users in a real app, let's reset it here
       groupId: userGroup ?? '',
     });
+    // Remove required validator on edit
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('password')?.updateValueAndValidity();
     this.dialogVisible.set(true);
   }
 
@@ -126,22 +131,22 @@ export class User {
     }
   }
 
-  saveUser(): void {
+  async saveUser(): Promise<void> {
     if (this.userForm.invalid) return;
     const { name, email, password, groupId } = this.userForm.value;
     const id = this.editingId();
 
     if (id) {
-      this.userService.update(id, { name: name!, email: email!, password: password! });
-      this.updateUserGroup(id, groupId ?? '');
+      await this.userService.update(id, { name: name!, email: email! });
+      await this.updateUserGroup(id, groupId ?? '');
       this.messageService.add({ severity: 'success', summary: 'Usuario actualizado', detail: `"${name}" se actualizó correctamente` });
     } else {
-      const newUser = this.userService.create({
-        name: name!, email: email!, password: password!,
+      const newUser = await this.userService.create({
+        name: name!, email: email!,
         permissions: ['ticket:view', 'ticket:create'],
       });
       if (groupId) {
-        this.groupService.addMember(groupId, newUser.id);
+        await this.groupService.addMember(groupId, newUser.id);
       }
       this.messageService.add({ severity: 'success', summary: 'Usuario creado', detail: `"${name}" fue creado exitosamente` });
     }
@@ -175,11 +180,11 @@ export class User {
     return group?.id ?? null;
   }
 
-  private updateUserGroup(userId: string, newGroupId: string): void {
+  private async updateUserGroup(userId: string, newGroupId: string): Promise<void> {
     const currentGroupId = this.getUserGroupId(userId);
     if (currentGroupId === newGroupId) return;
-    if (currentGroupId) this.groupService.removeMember(currentGroupId, userId);
-    if (newGroupId) this.groupService.addMember(newGroupId, userId);
+    if (currentGroupId) await this.groupService.removeMember(currentGroupId, userId);
+    if (newGroupId) await this.groupService.addMember(newGroupId, userId);
   }
 
   getPermissionLabel(user: UserModel): string {

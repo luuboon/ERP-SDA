@@ -6,6 +6,7 @@
     <!-- Page Header -->
     <div class="page-header">
         <div class="page-header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" (onClick)="goToDashboard()" pTooltip="Volver al Dashboard" />
             <h2 class="page-title">Tickets</h2>
             <span class="page-count">{{ filteredTickets().length }} tickets</span>
             @if (statusFilter()) {

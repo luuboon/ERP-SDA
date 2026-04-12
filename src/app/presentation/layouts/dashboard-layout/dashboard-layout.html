@@ -48,7 +48,11 @@
                 <div class="main-header-breadcrumb">
                     <span class="pi pi-home breadcrumb-icon"></span>
                     <span class="breadcrumb-sep">/</span>
-                    <span class="breadcrumb-current">Panel de Control</span>
+                    <a [routerLink]="['/dashboard', groupId()]" class="breadcrumb-link" [class.breadcrumb-current]="!pageTitle()" style="text-decoration: none; color: inherit;">Panel de Control</a>
+                    @if (pageTitle()) {
+                    <span class="breadcrumb-sep">/</span>
+                    <span class="breadcrumb-current">{{ pageTitle() }}</span>
+                    }
                 </div>
             </div>
             <div class="main-header-right">

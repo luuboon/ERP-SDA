@@ -43,10 +43,10 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(4)]],
   });
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) return;
     const { email, password } = this.loginForm.value;
-    const result = this.auth.login(email!, password!);
+    const result = await this.auth.login(email!, password!);
 
     if (result.success) {
       this.messageService.add({ severity: 'success', summary: 'Bienvenido', detail: 'Inicio de sesión exitoso' });

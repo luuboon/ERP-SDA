@@ -1,59 +1,47 @@
-# ErpLuu
+# ERP-Luu
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.16.
+Un sistema Enterprise Resource Planning (ERP) moderno, modular y reactivo construido con Angular 18+ y PrimeNG.
 
-## Development server
+## Visión del Proyecto
 
-To start a local development server, run:
+El objetivo de **ERP-Luu** es proveer una plataforma robusta, segura y fácil de usar para la gestión integral de recursos empresariales. Actualmente se encuentra en su fase inicial de frontend, implementando principios de diseño moderno y estado reactivo basado en Angular Signals.
 
-```bash
-ng serve
-```
+Este proyecto ha sido diseñado con una clara **separación de responsabilidades** (capas de abstracción y repositorios), permitiendo que la persistencia en memoria actual (mock data) sea fácilmente reemplazable por un backend real escrito en Go en futuras versiones, sin necesidad de reescribir la lógica de la UI ni los servicios de estado.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Características Actuales
 
-## Code scaffolding
+- **Autenticación:** Flujo de login y registro de usuarios, completamente desacoplado del almacén seguro (las contraseñas nunca viajan ni se almacenan en los modelos del frontend).
+- **Control de Acceso:** Rutas protegidas mediante `AuthGuard` para evitar accesos no autorizados.
+- **Gestión de Roles y Permisos:** Administración centralizada de usuarios, grupos y sus respectivos niveles de permisos.
+- **Módulo de Tickets:** Sistema tipo Kanban para la gestión, priorización y control del estado de los tickets, con asignación automatizada entre grupos.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Estructura de Abstracción
 
-```bash
-ng generate component component-name
-```
+El repositorio está preparado para conexión B2B o API RESTFUL con los siguientes repositorios listos para conectar vía inyección de dependencias (`src/app/infrastructure/repositories`):
+- `UserRepository`
+- `AuthRepository`
+- `TicketRepository`
+- `GroupRepository`
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Requisitos Previos
 
-```bash
-ng generate --help
-```
+- [Node.js](https://nodejs.org/) (Versión 18 o superior)
+- Angular CLI (`npm install -g @angular/cli`)
 
-## Building
+## Instalación y Uso
 
-To build the project run:
+1. Clonar el repositorio.
+2. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+3. Levantar el servidor de desarrollo:
+   ```bash
+   ng serve
+   ```
+4. Abrir en el navegador: [http://localhost:4200/](http://localhost:4200/)
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Información de Testing (Mock Data)
+Para ingresar al sistema puede utilizar localmente el usuario administrador temporal:
+* **Email:** `admin@erp.com`
+* **Contraseña:** `admin123`

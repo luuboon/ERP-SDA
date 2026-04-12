@@ -41,7 +41,7 @@ export class RegisterComponent {
     confirmPassword: ['', [Validators.required]],
   });
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) return;
     const { name, email, password, confirmPassword } = this.registerForm.value;
 
@@ -50,7 +50,7 @@ export class RegisterComponent {
       return;
     }
 
-    const result = this.auth.register({ name: name!, email: email!, password: password! });
+    const result = await this.auth.register({ name: name!, email: email!, password: password! });
 
     if (result.success) {
       this.messageService.add({ severity: 'success', summary: 'Cuenta creada', detail: 'Bienvenido a ERP-Luu' });

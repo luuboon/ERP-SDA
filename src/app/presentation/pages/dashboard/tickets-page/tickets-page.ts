@@ -6,7 +6,7 @@ import {
     computed,
     OnInit,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { TicketService } from '../../../../application/services/ticket.service';
@@ -71,6 +71,7 @@ export class TicketsPage implements OnInit {
     private confirmationService = inject(ConfirmationService);
     private fb = inject(FormBuilder);
     private route = inject(ActivatedRoute);
+    private router = inject(Router);
 
     groupId = signal<string>('');
 
@@ -388,5 +389,9 @@ export class TicketsPage implements OnInit {
 
     hasPermission(permission: string): boolean {
         return this.authService.hasPermission(permission);
+    }
+
+    goToDashboard(): void {
+        this.router.navigate(['/dashboard', this.groupId()]);
     }
 }

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     {
@@ -7,10 +8,12 @@ export const routes: Routes = [
     },
     {
         path: 'group-selection',
+        canActivate: [authGuard],
         loadComponent: () => import('./presentation/pages/dashboard/group-selection-page/group-selection-page').then(m => m.GroupSelectionPage)
     },
     {
         path: 'dashboard/:groupId',
+        canActivate: [authGuard],
         loadComponent: () => import('./presentation/layouts/dashboard-layout/dashboard-layout').then(m => m.DashboardLayout),
         loadChildren: () => import('./presentation/layouts/dashboard-layout/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
     },

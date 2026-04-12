@@ -8,6 +8,7 @@
                 <p class="hero-subtitle">Resumen de actividad y gestión de tickets del equipo</p>
             </div>
             <div class="hero-actions">
+                <p-button label="Tickets" icon="pi pi-ticket" (onClick)="goToTickets()" />
                 @if (hasPermission('ticket:create')) {
                 <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="goToTickets()" />
                 }

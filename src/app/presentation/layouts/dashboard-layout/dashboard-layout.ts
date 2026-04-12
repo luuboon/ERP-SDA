@@ -29,6 +29,7 @@ export class DashboardLayout implements OnInit {
   readonly currentUser = this.authService.currentUser;
 
   groupId = signal<string>('');
+  pageTitle = signal<string>('');
 
   readonly currentGroup = computed(() => {
     const id = this.groupId();
@@ -41,7 +42,6 @@ export class DashboardLayout implements OnInit {
 
     const all: NavItem[] = [
       { label: 'Dashboard', icon: 'pi pi-chart-bar', route: `/dashboard/${id}`, exact: true },
-      { label: 'Tickets', icon: 'pi pi-ticket', route: `/dashboard/${id}/tickets`, permission: PERMISSIONS.TICKET_VIEW },
       { label: 'Groups', icon: 'pi pi-users', route: `/dashboard/${id}/group`, permission: PERMISSIONS.GROUP_ADD },
       { label: 'Users', icon: 'pi pi-user', route: `/dashboard/${id}/user`, permission: PERMISSIONS.USER_VIEW },
     ];
@@ -59,6 +59,27 @@ export class DashboardLayout implements OnInit {
 
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/auth/login']);
+    }
+
+    this.router.events.subscribe(() => {
+      this.updatePageTitle(this.router.url);
+    });
+    this.updatePageTitle(this.router.url);
+  }
+
+  private updatePageTitle(url: string) {
+    if (url.includes('/tickets')) {
+      this.pageTitle.set('Tickets');
+    } else if (url.match(/\/group\/.+/)) {
+      this.pageTitle.set('Detalles de Grupo');
+    } else if (url.includes('/group')) {
+      this.pageTitle.set('Grupos');
+    } else if (url.includes('/user')) {
+      this.pageTitle.set('Usuarios');
+    } else if (url.includes('/profile')) {
+      this.pageTitle.set('Perfil de Usuario');
+    } else {
+      this.pageTitle.set('');
     }
   }
 
