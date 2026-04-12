@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { Ticket, TicketStatus } from '../models/ticket.model';
 
 export abstract class TicketRepository {
