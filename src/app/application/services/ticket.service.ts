@@ -73,4 +73,12 @@ export class TicketService {
             this._tickets.update(list => list.map(t => t.id === ticketId ? updated : t));
         }
     }
+
+    async reloadById(id: string): Promise<Ticket | undefined> {
+        const updated = await this.repository.getById(id);
+        if (updated) {
+            this._tickets.update(list => list.map(t => t.id === id ? updated : t));
+        }
+        return updated;
+    }
 }

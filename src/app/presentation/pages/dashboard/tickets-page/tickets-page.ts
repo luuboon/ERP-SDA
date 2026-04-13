@@ -304,22 +304,22 @@ export class TicketsPage implements OnInit {
         this.detailDialogVisible.set(true);
     }
 
-    refreshDetail(): void {
+    async refreshDetail(): Promise<void> {
         const current = this.selectedTicket();
-        if (current) {
-            const updated = this.ticketService.getById(current.id);
-            if (updated) this.selectedTicket.set({ ...updated });
-        }
+        if (!current) return;
+        const updated = await this.ticketService.reloadById(current.id);
+        if (updated) this.selectedTicket.set({ ...updated });
     }
 
-    addComment(): void {
+    async addComment(): Promise<void> {
         const ticket = this.selectedTicket();
         const comment = this.newComment().trim();
         const userName = this.authService.currentUser()?.name || 'Unknown';
         if (!ticket || !comment) return;
-        this.ticketService.addComment(ticket.id, userName, comment);
+        await this.ticketService.addComment(ticket.id, userName, comment);
         this.newComment.set('');
-        this.refreshDetail();
+        await this.refreshDetail();
+        this.messageService.add({ severity: 'success', summary: 'Comentario agregado', detail: 'Tu comentario fue publicado' });
     }
 
     // Drag & drop
