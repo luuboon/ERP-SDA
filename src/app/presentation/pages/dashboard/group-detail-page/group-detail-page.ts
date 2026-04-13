@@ -14,6 +14,7 @@ import { UserService } from '../../../../application/services/user.service';
 import { TicketService } from '../../../../application/services/ticket.service';
 import { PermissionService } from '../../../../application/services/permission.service';
 import { Group } from '../../../../core/models/group.model';
+import { User } from '../../../../core/models/user.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -164,7 +165,7 @@ export class GroupDetailPage implements OnInit {
         return this.userService.getById(userId)?.name ?? userId;
     }
 
-    getPermissionLabel(user: { permissions: string[] }): string {
-        return this.userService.getPermissionLabel(user as any);
+    getPermissionLabel(user: User): string {
+        return this.userService.getPermissionLabel(user);
     }
 }
