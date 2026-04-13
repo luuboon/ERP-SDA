@@ -14,8 +14,11 @@ import { InMemoryGroupRepository } from './infrastructure/repositories/in-memory
 import { AuthRepository } from './core/repositories/auth.repository';
 import { InMemoryAuthRepository } from './infrastructure/repositories/in-memory/in-memory-auth.repository';
 
+import { provideHttpClient } from '@angular/common/http';
+
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideAnimationsAsync(),

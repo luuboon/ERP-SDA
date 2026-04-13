@@ -4,36 +4,27 @@
  */
 
 export const PERMISSIONS = {
-    // Ticket permissions
-    TICKET_CREATE: 'ticket:create',
-    TICKET_EDIT: 'ticket:edit',
-    TICKET_DELETE: 'ticket:delete',
-    TICKET_VIEW: 'ticket:view',
+  // Tickets
+  TICKETS_ADD:    'tickets:add',
+  TICKETS_MOVE:   'tickets:move',
+  TICKETS_VIEW:   'tickets:view',
+  TICKETS_DELETE: 'tickets:delete',
 
-    // Group permissions
-    GROUP_ADD: 'group:add',
-    GROUP_EDIT: 'group:edit',
-    GROUP_DELETE: 'group:delete',
+  // Groups
+  GROUPS_MANAGE:  'groups:manage',
 
-    // User management permissions
-    USER_CREATE: 'user:create',
-    USER_EDIT: 'user:edit',
-    USER_DELETE: 'user:delete',
-    USER_VIEW: 'user:view',
-    USER_MANAGE_PERMISSIONS: 'user:manage-permissions',
+  // Users
+  USERS_MANAGE:   'users:manage',
 } as const;
 
-export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
 
 /** All available permissions as an array (for UI iteration) */
 export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS);
 
-/** Check if a user's permission list includes a specific permission */
-export function hasPermission(permissions: string[], permission: string): boolean {
-    return permissions.includes(permission);
-}
+// Mapa de permisos por grupo: { 'g-alpha': ['tickets:add', 'tickets:view'], ... }
+export type GroupPermissionsMap = Record<string, Permission[]>;
 
-/** Returns true if the user has every permission in the system */
-export function hasAllPermissions(permissions: string[]): boolean {
-    return ALL_PERMISSIONS.every(p => permissions.includes(p));
+export function hasPermission(permsForGroup: string[], permission: string): boolean {
+  return permsForGroup.includes(permission);
 }

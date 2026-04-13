@@ -8,11 +8,13 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
 import { DatePipe } from '@angular/common';
 import { TicketService } from '../../../../application/services/ticket.service';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
 import { AuthService } from '../../../../application/services/auth.service';
+import { PermissionService } from '../../../../application/services/permission.service';
 import { Ticket, TicketStatus, TicketPriority } from '../../../../core/models/ticket.model';
 import { PERMISSIONS } from '../../../../core/models/permission.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -38,6 +40,7 @@ import { DragDropModule } from 'primeng/dragdrop';
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        HasPermissionDirective,
         ReactiveFormsModule,
         FormsModule,
         DatePipe,
@@ -68,6 +71,7 @@ export class TicketsPage implements OnInit {
     private userService = inject(UserService);
     private messageService = inject(MessageService);
     private authService = inject(AuthService);
+    private permissionService = inject(PermissionService);
     private confirmationService = inject(ConfirmationService);
     private fb = inject(FormBuilder);
     private route = inject(ActivatedRoute);
@@ -76,7 +80,7 @@ export class TicketsPage implements OnInit {
     groupId = signal<string>('');
 
     readonly isSuperAdmin = computed(() =>
-        this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS)
+        this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE)
     );
 
     readonly tickets = computed(() => {
@@ -207,7 +211,7 @@ export class TicketsPage implements OnInit {
         const user = this.authService.currentUser();
         const isCreator = ticket.createdBy === user?.id;
         const isAssigned = ticket.assignedTo === user?.id;
-        const isSuperAdmin = user && this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+        const isSuperAdmin = user && this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE);
 
         if (isCreator || isSuperAdmin) {
             this.ticketForm.enable();
@@ -268,13 +272,13 @@ export class TicketsPage implements OnInit {
     canEditCurrentTicket(ticket: Ticket): boolean {
         const u = this.authService.currentUser();
         if (!u) return false;
-        return ticket.createdBy === u.id || ticket.assignedTo === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+        return ticket.createdBy === u.id || ticket.assignedTo === u.id || this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE);
     }
 
     canDeleteCurrentTicket(ticket: Ticket): boolean {
         const u = this.authService.currentUser();
         if (!u) return false;
-        return ticket.createdBy === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+        return ticket.createdBy === u.id || this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE);
     }
 
     confirmDelete(ticket: Ticket): void {
@@ -327,20 +331,27 @@ export class TicketsPage implements OnInit {
         this.draggedTicket.set(null);
     }
 
+    canMoveTicket(ticket: Ticket): boolean {
+        const user = this.authService.currentUser();
+        if (!user) return false;
+        const isAssigned = ticket.assignedTo === user.id;
+        const hasMove = this.permissionService.hasPermission(PERMISSIONS.TICKETS_MOVE);
+        const isAdmin = this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE);
+        return (isAssigned && hasMove) || isAdmin;
+    }
+
     onDrop(status: TicketStatus): void {
         const ticket = this.draggedTicket();
         if (!ticket) return;
 
-        const u = this.authService.currentUser();
-        const canEdit = u && (ticket.createdBy === u.id || ticket.assignedTo === u.id || this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS));
-
-        if (!canEdit) {
-            this.messageService.add({ severity: 'error', summary: 'Permiso denegado', detail: 'Solo el creador o asignado puede mover este ticket' });
+        if (!this.canMoveTicket(ticket)) {
+            this.messageService.add({ severity: 'error', summary: 'Permiso denegado', detail: 'Solo puedes mover tickets asignados a ti con permiso tickets:move o siendo admin' });
             this.draggedTicket.set(null);
             return;
         }
 
         if (ticket.status !== status) {
+            const u = this.authService.currentUser();
             const userName = u?.name || 'Unknown';
             this.ticketService.updateStatus(ticket.id, status, userName);
             this.messageService.add({
@@ -385,10 +396,6 @@ export class TicketsPage implements OnInit {
 
     clearFilter(): void {
         this.statusFilter.set(null);
-    }
-
-    hasPermission(permission: string): boolean {
-        return this.authService.hasPermission(permission);
     }
 
     goToDashboard(): void {

@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
 import { TicketService } from '../../../../application/services/ticket.service';
-import { AuthService } from '../../../../application/services/auth.service';
+import { PermissionService } from '../../../../application/services/permission.service';
 import { Group } from '../../../../core/models/group.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -24,6 +24,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
 
 @Component({
     selector: 'app-group-detail-page',
@@ -41,6 +42,7 @@ import { SelectModule } from 'primeng/select';
         TagModule,
         TooltipModule,
         SelectModule,
+        HasPermissionDirective,
     ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './group-detail-page.html',
@@ -54,7 +56,7 @@ export class GroupDetailPage implements OnInit {
     private ticketService = inject(TicketService);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
-    private authService = inject(AuthService);
+    private permissionService = inject(PermissionService);
 
     group = signal<Group | null>(null);
     selectedUserId = signal<string | null>(null);
@@ -164,9 +166,5 @@ export class GroupDetailPage implements OnInit {
 
     getPermissionLabel(user: { permissions: string[] }): string {
         return this.userService.getPermissionLabel(user as any);
-    }
-
-    hasPermission(permission: string): boolean {
-        return this.authService.hasPermission(permission);
     }
 }

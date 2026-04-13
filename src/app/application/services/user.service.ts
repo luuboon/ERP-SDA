@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { User } from '../../core/models/user.model';
-import { ALL_PERMISSIONS, hasAllPermissions } from '../../core/models/permission.model';
+import { PERMISSIONS } from '../../core/models/permission.model';
 import { UserRepository } from '../../core/repositories/user.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -48,13 +48,22 @@ export class UserService {
     }
 
     async grantAllPermissions(userId: string): Promise<void> {
-        await this.update(userId, { permissions: [...ALL_PERMISSIONS] });
+        await this.update(userId, { globalPermissions: Object.values(PERMISSIONS) });
     }
 
     getPermissionLabel(user: User): string {
-        if (hasAllPermissions(user.permissions)) return 'Acceso total';
-        if (user.permissions.length >= 6) return 'Avanzado';
-        if (user.permissions.length >= 3) return 'Estándar';
+        const globalCount = user.globalPermissions?.length || 0;
+        let groupCount = 0;
+        if (user.permissionsByGroup) {
+            Object.values(user.permissionsByGroup).forEach(perms => {
+                groupCount += perms.length;
+            });
+        }
+        const total = globalCount + groupCount;
+        
+        if (user.globalPermissions?.includes(PERMISSIONS.USERS_MANAGE)) return 'Super Admin';
+        if (total >= 4) return 'Avanzado';
+        if (total >= 2) return 'Estándar';
         return 'Básico';
     }
 }

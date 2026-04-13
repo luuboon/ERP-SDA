@@ -19,9 +19,7 @@
             <p-toggleButton [ngModel]="isListView()" (ngModelChange)="isListView.set($event)"
                 onLabel="Lista" offLabel="Kanban" onIcon="pi pi-list" offIcon="pi pi-th-large"
                 styleClass="view-toggle" />
-            @if (hasPermission('ticket:create')) {
-                <p-button label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
-            }
+            <p-button *appHasPermission="'tickets:add'" label="Nuevo Ticket" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
         </div>
     </div>
 

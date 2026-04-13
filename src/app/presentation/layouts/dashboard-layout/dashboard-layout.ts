@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, ActivatedRoute, Router } fr
 import { AuthService } from '../../../application/services/auth.service';
 import { PERMISSIONS } from '../../../core/models/permission.model';
 import { GroupService } from '../../../application/services/group.service';
+import { PermissionService } from '../../../application/services/permission.service';
 
 interface NavItem {
   label: string;
@@ -25,6 +26,7 @@ export class DashboardLayout implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private groupService = inject(GroupService);
+  private permissionService = inject(PermissionService);
 
   readonly currentUser = this.authService.currentUser;
 
@@ -42,10 +44,12 @@ export class DashboardLayout implements OnInit {
 
     const all: NavItem[] = [
       { label: 'Dashboard', icon: 'pi pi-chart-bar', route: `/dashboard/${id}`, exact: true },
-      { label: 'Groups', icon: 'pi pi-users', route: `/dashboard/${id}/group`, permission: PERMISSIONS.GROUP_ADD },
-      { label: 'Users', icon: 'pi pi-user', route: `/dashboard/${id}/user`, permission: PERMISSIONS.USER_VIEW },
+      { label: 'Tickets', icon: 'pi pi-ticket', route: `/dashboard/${id}/tickets` },
+      { label: 'Grupos', icon: 'pi pi-users', route: `/dashboard/${id}/group`, permission: PERMISSIONS.GROUPS_MANAGE },
+      { label: 'Usuarios', icon: 'pi pi-user', route: `/dashboard/${id}/user`, permission: PERMISSIONS.USERS_MANAGE },
+      { label: 'Perfil', icon: 'pi pi-id-card', route: `/dashboard/${id}/profile` },
     ];
-    return all.filter(item => !item.permission || this.authService.hasPermission(item.permission));
+    return all.filter(item => !item.permission || this.permissionService.hasPermission(item.permission));
   });
 
   ngOnInit() {
@@ -53,6 +57,7 @@ export class DashboardLayout implements OnInit {
       const id = params.get('groupId');
       if (id) {
         this.groupId.set(id);
+        this.permissionService.refreshPermissionsForGroup(id);
         this.verifyAccess(id);
       }
     });
@@ -93,7 +98,7 @@ export class DashboardLayout implements OnInit {
     }
 
     const isMember = group.memberIds.includes(user.id);
-    const isSuperAdmin = this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS);
+    const isSuperAdmin = this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE);
     const isAuthor = group.author === user.name;
 
     if (!isMember && !isSuperAdmin && !isAuthor) {

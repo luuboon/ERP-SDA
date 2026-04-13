@@ -9,9 +9,7 @@
             <h2 class="page-title">Usuarios</h2>
             <span class="page-count">{{ users().length }} usuarios</span>
         </div>
-        @if (canCreateUser()) {
-        <p-button label="Nuevo Usuario" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
-        }
+        <p-button *appHasPermission="'users:manage'" label="Nuevo Usuario" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
     </div>
 
     <!-- Users Table -->
@@ -52,18 +50,12 @@
                     </td>
                     <td style="text-align: center;">
                         <div class="row-actions">
-                            @if (canManagePermissions()) {
-                            <p-button icon="pi pi-shield" severity="info" [text]="true" [rounded]="true"
+                            <p-button *appHasPermission="'users:manage'" icon="pi pi-shield" severity="info" [text]="true" [rounded]="true"
                                 pTooltip="Permisos" (onClick)="openPermissions(user)" />
-                            }
-                            @if (canEditUser()) {
-                            <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
+                            <p-button *appHasPermission="'users:manage'" icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
                                 pTooltip="Editar" (onClick)="openEdit(user)" />
-                            }
-                            @if (canDeleteUser()) {
-                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                            <p-button *appHasPermission="'users:manage'" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
                                 pTooltip="Eliminar" (onClick)="confirmDelete(user)" />
-                            }
                         </div>
                     </td>
                 </tr>

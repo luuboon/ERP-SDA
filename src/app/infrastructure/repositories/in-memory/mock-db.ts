@@ -12,47 +12,55 @@ export const MockDB = {
             name: 'Super Admin',
             email: 'admin@erp.com',
             password: 'admin123',
-            permissions: [...ALL_PERMISSIONS],
+            globalPermissions: [...ALL_PERMISSIONS],
+            permissionsByGroup: {
+              'g-alpha':  [...ALL_PERMISSIONS],
+              'g-design': [...ALL_PERMISSIONS],
+              'g-sales':  [...ALL_PERMISSIONS],
+            },
         },
         {
             id: 'u-carlos',
             name: 'Carlos Méndez',
             email: 'carlos@erp.com',
             password: 'carlos123',
-            permissions: [
-                PERMISSIONS.TICKET_EDIT,
-                PERMISSIONS.TICKET_VIEW,
-            ],
+            globalPermissions: [],
+            permissionsByGroup: {
+              'g-alpha': [PERMISSIONS.TICKETS_VIEW, PERMISSIONS.TICKETS_MOVE],
+              'g-sales': [PERMISSIONS.TICKETS_VIEW],
+            },
         },
         {
             id: 'u-ana',
             name: 'Ana García',
             email: 'ana@erp.com',
             password: 'ana123',
-            permissions: [
-                PERMISSIONS.TICKET_CREATE, PERMISSIONS.TICKET_EDIT,
-                PERMISSIONS.TICKET_VIEW,
-                PERMISSIONS.GROUP_ADD, PERMISSIONS.GROUP_EDIT, PERMISSIONS.GROUP_DELETE,
-            ],
+            globalPermissions: [],
+            permissionsByGroup: {
+              'g-design': [PERMISSIONS.TICKETS_ADD, PERMISSIONS.TICKETS_VIEW, PERMISSIONS.TICKETS_MOVE, PERMISSIONS.GROUPS_MANAGE],
+              'g-alpha':  [PERMISSIONS.TICKETS_VIEW],
+            },
         },
         {
             id: 'u-laura',
             name: 'Laura Torres',
             email: 'laura@erp.com',
             password: 'laura123',
-            permissions: [
-                PERMISSIONS.TICKET_VIEW,
-                PERMISSIONS.TICKET_CREATE,
-            ],
+            globalPermissions: [],
+            permissionsByGroup: {
+              'g-sales': [PERMISSIONS.TICKETS_VIEW, PERMISSIONS.TICKETS_ADD, PERMISSIONS.TICKETS_MOVE],
+              'g-alpha': [PERMISSIONS.TICKETS_VIEW],
+            },
         },
         {
             id: 'u-miguel',
             name: 'Miguel Ríos',
             email: 'miguel@erp.com',
             password: 'miguel123',
-            permissions: [
-                PERMISSIONS.TICKET_VIEW,
-            ],
+            globalPermissions: [],
+            permissionsByGroup: {
+              'g-alpha': [PERMISSIONS.TICKETS_VIEW],
+            },
         },
     ] as UserDb[],
     

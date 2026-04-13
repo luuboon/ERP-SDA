@@ -8,9 +8,10 @@ import {
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { UserService } from '../../../../application/services/user.service';
 import { GroupService } from '../../../../application/services/group.service';
-import { AuthService } from '../../../../application/services/auth.service';
+import { PermissionService } from '../../../../application/services/permission.service';
 import { User as UserModel } from '../../../../core/models/user.model';
-import { ALL_PERMISSIONS, PERMISSIONS } from '../../../../core/models/permission.model';
+import { PERMISSIONS } from '../../../../core/models/permission.model';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -45,6 +46,7 @@ import { PasswordModule } from 'primeng/password';
     ConfirmDialogModule,
     TagModule,
     TooltipModule,
+    HasPermissionDirective,
     CheckboxModule,
     PasswordModule,
   ],
@@ -55,17 +57,14 @@ import { PasswordModule } from 'primeng/password';
 export class User {
   private userService = inject(UserService);
   private groupService = inject(GroupService);
-  private authService = inject(AuthService);
+  private permissionService = inject(PermissionService);
+  private authService = inject(AuthService); // for refreshCurrentUser
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
 
   readonly users = this.userService.users;
-  readonly allPermissions = ALL_PERMISSIONS;
-  readonly canCreateUser = computed(() => this.authService.hasPermission(PERMISSIONS.USER_CREATE));
-  readonly canEditUser = computed(() => this.authService.hasPermission(PERMISSIONS.USER_EDIT));
-  readonly canDeleteUser = computed(() => this.authService.hasPermission(PERMISSIONS.USER_DELETE));
-  readonly canManagePermissions = computed(() => this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS));
+  readonly allPermissions = Object.values(PERMISSIONS);
 
   readonly groupOptions = computed(() =>
     this.groupService.groups().map(g => ({ label: g.name, value: g.id }))
@@ -109,16 +108,20 @@ export class User {
 
   openPermissions(user: UserModel): void {
     this.editingPermUser.set(user);
-    this.editingPermissions.set([...user.permissions]);
+    this.editingPermissions.set([...(user.globalPermissions || [])]);
     this.permDialogVisible.set(true);
   }
 
   savePermissions(): void {
     const user = this.editingPermUser();
     if (!user) return;
-    this.userService.update(user.id, { permissions: [...this.editingPermissions()] });
-    this.authService.refreshCurrentUser();
-    this.messageService.add({ severity: 'success', summary: 'Permisos actualizados', detail: `Permisos de "${user.name}" fueron actualizados` });
+    this.userService.update(user.id, { globalPermissions: [...this.editingPermissions()] });
+    // Refrezcar todo el estado al cambiar mis propios permisos
+    const currentWait = this.authService.currentUser();
+    if (currentWait?.id === user.id) {
+        this.authService.logout(); // Si me quito permisos a mi mismo se debe desloguear (por seguridad). Reforzar despues con backend
+    }
+    this.messageService.add({ severity: 'success', summary: 'Permisos actualizados', detail: `Permisos globales de "${user.name}" fueron actualizados` });
     this.permDialogVisible.set(false);
   }
 
@@ -143,7 +146,8 @@ export class User {
     } else {
       const newUser = await this.userService.create({
         name: name!, email: email!,
-        permissions: ['ticket:view', 'ticket:create'],
+        globalPermissions: [],
+        permissionsByGroup: {}
       });
       if (groupId) {
         await this.groupService.addMember(groupId, newUser.id);

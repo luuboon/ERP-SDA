@@ -5,7 +5,7 @@ import { MockDB, cleanUser } from './mock-db';
 
 @Injectable({ providedIn: 'root' })
 export class InMemoryAuthRepository implements AuthRepository {
-    async login(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    async login(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string; token?: string }> {
         const dbUser = MockDB.users.find(u => u.email === email);
         if (!dbUser) {
             return Promise.resolve({ success: false, error: 'Usuario no encontrado' });
@@ -13,10 +13,10 @@ export class InMemoryAuthRepository implements AuthRepository {
         if (dbUser.password !== password) {
             return Promise.resolve({ success: false, error: 'Contraseña incorrecta' });
         }
-        return Promise.resolve({ success: true, user: cleanUser(dbUser) });
+        return Promise.resolve({ success: true, user: cleanUser(dbUser), token: 'mock-jwt-token' });
     }
 
-    async register(data: { name: string; email: string; password: string }): Promise<{ success: boolean; user?: User; error?: string }> {
+    async register(data: { name: string; email: string; password: string }): Promise<{ success: boolean; user?: User; error?: string; token?: string }> {
         const existing = MockDB.users.find(u => u.email === data.email);
         if (existing) {
             return Promise.resolve({ success: false, error: 'El email ya está registrado' });
@@ -26,9 +26,10 @@ export class InMemoryAuthRepository implements AuthRepository {
             name: data.name,
             email: data.email,
             password: data.password,
-            permissions: ['ticket:view', 'ticket:create'],
+            globalPermissions: [],
+            permissionsByGroup: {},
         };
         MockDB.users.push(dbUser);
-        return Promise.resolve({ success: true, user: cleanUser(dbUser) });
+        return Promise.resolve({ success: true, user: cleanUser(dbUser), token: 'mock-jwt-token' });
     }
 }

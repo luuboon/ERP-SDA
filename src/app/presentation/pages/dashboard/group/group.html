@@ -9,9 +9,7 @@
             <h2 class="page-title">Groups</h2>
             <span class="page-count">{{ groups().length }} grupos</span>
         </div>
-        @if (canCreateGroup()) {
-        <p-button label="Nuevo Grupo" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
-        }
+        <p-button *appHasPermission="'groups:manage'" label="Nuevo Grupo" icon="pi pi-plus" severity="contrast" (onClick)="openCreate()" />
     </div>
 
     <!-- Groups Table -->
@@ -75,14 +73,10 @@
                         <div class="row-actions">
                             <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true"
                                 pTooltip="Ver detalle" (onClick)="viewGroup(group)" />
-                            @if (canEditGroup()) {
-                            <p-button icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
+                            <p-button *appHasPermission="'groups:manage'" icon="pi pi-pencil" severity="secondary" [text]="true" [rounded]="true"
                                 pTooltip="Editar" (onClick)="openEdit(group)" />
-                            }
-                            @if (canDeleteGroup()) {
-                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                            <p-button *appHasPermission="'groups:manage'" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
                                 pTooltip="Eliminar" (onClick)="confirmDelete(group)" />
-                            }
                         </div>
                     </td>
                 </tr>

@@ -12,7 +12,9 @@ import { TicketService } from '../../../../application/services/ticket.service';
 import { GroupService } from '../../../../application/services/group.service';
 import { UserService } from '../../../../application/services/user.service';
 import { TicketStatus, TicketPriority, Ticket } from '../../../../core/models/ticket.model';
-import { AuthService } from '../../../../application/services/auth.service';
+import { DashboardLayout } from '../../../../presentation/layouts/dashboard-layout/dashboard-layout'; // Unused? Just testing. Actually we don't need layout.
+import { PermissionService } from '../../../../application/services/permission.service';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -23,7 +25,7 @@ import { TooltipModule } from 'primeng/tooltip';
     selector: 'app-dashboard-page',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [DatePipe, CardModule, ButtonModule, TableModule, TagModule, TooltipModule],
+    imports: [DatePipe, CardModule, ButtonModule, TableModule, TagModule, TooltipModule, HasPermissionDirective],
     templateUrl: './dashboard-page.html',
     styleUrl: './dashboard-page.css',
 })
@@ -33,7 +35,7 @@ export class DashboardPage implements OnInit {
     private userService = inject(UserService);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
-    private authService = inject(AuthService);
+    private permissionService = inject(PermissionService);
 
     groupId = signal<string>('');
 
@@ -127,9 +129,5 @@ export class DashboardPage implements OnInit {
             'Urgente': 'danger',
         };
         return map[priority] ?? 'secondary';
-    }
-
-    hasPermission(permission: string): boolean {
-        return this.authService.hasPermission(permission);
     }
 }

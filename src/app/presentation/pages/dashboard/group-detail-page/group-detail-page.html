@@ -30,15 +30,13 @@
                 </ng-template>
 
                 <!-- Add member row -->
-                @if (hasPermission('group:edit') || hasPermission('user:manage_permissions')) {
-                <div class="add-member-row">
+                <div *appHasPermission="'groups:manage'" class="add-member-row">
                     <p-select [options]="availableUsers()" optionLabel="label" optionValue="value"
                         placeholder="Seleccionar usuario..." [(ngModel)]="selectedUserId" appendTo="body"
                         styleClass="w-full" [filter]="true" filterPlaceholder="Buscar usuario..." />
                     <p-button icon="pi pi-plus" severity="contrast" (onClick)="addMember()"
                         [disabled]="!selectedUserId()" pTooltip="Agregar miembro" />
                 </div>
-                }
 
                 <!-- Members list -->
                 @if (members().length > 0) {
@@ -54,10 +52,8 @@
                         </div>
                         <div class="member-actions">
                             <p-tag [value]="getPermissionLabel(member)" severity="secondary" />
-                            @if (hasPermission('group:edit') || hasPermission('user:manage_permissions')) {
-                            <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true" size="small"
+                            <p-button *appHasPermission="'groups:manage'" icon="pi pi-times" severity="danger" [text]="true" [rounded]="true" size="small"
                                 pTooltip="Eliminar del grupo" (onClick)="confirmRemoveMember(member.id, member.name)" />
-                            }
                         </div>
                     </div>
                     }

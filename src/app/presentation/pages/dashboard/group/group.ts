@@ -22,8 +22,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { AuthService } from '../../../../application/services/auth.service';
+import { PermissionService } from '../../../../application/services/permission.service';
 import { PERMISSIONS } from '../../../../core/models/permission.model';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
 
 const CATEGORIES = ['Ingeniería', 'Diseño', 'Ventas', 'Operaciones', 'Marketing', 'Soporte'];
 const LEVELS = ['Junior', 'Mid', 'Senior', 'Lead'];
@@ -35,6 +36,7 @@ const LEVELS = ['Junior', 'Mid', 'Senior', 'Lead'];
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    HasPermissionDirective,
     ReactiveFormsModule,
     ButtonModule,
     CardModule,
@@ -54,7 +56,7 @@ const LEVELS = ['Junior', 'Mid', 'Senior', 'Lead'];
 })
 export class Group {
   private groupService = inject(GroupService);
-  private authService = inject(AuthService);
+  private permissionService = inject(PermissionService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
@@ -64,10 +66,6 @@ export class Group {
   readonly groups = this.groupService.groups;
   readonly categories = CATEGORIES;
   readonly levels = LEVELS;
-
-  readonly canCreateGroup = computed(() => this.authService.hasPermission(PERMISSIONS.GROUP_ADD));
-  readonly canEditGroup = computed(() => this.authService.hasPermission(PERMISSIONS.GROUP_EDIT));
-  readonly canDeleteGroup = computed(() => this.authService.hasPermission(PERMISSIONS.GROUP_DELETE));
 
   dialogVisible = signal(false);
   editingId = signal<string | null>(null);
