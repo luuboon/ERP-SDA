@@ -44,7 +44,6 @@ export class DashboardLayout implements OnInit {
 
     const all: NavItem[] = [
       { label: 'Dashboard', icon: 'pi pi-chart-bar', route: `/dashboard/${id}`, exact: true },
-      { label: 'Tickets', icon: 'pi pi-ticket', route: `/dashboard/${id}/tickets` },
       { label: 'Grupos', icon: 'pi pi-users', route: `/dashboard/${id}/group`, permission: PERMISSIONS.GROUPS_MANAGE },
       { label: 'Usuarios', icon: 'pi pi-user', route: `/dashboard/${id}/user`, permission: PERMISSIONS.USERS_MANAGE },
       { label: 'Perfil', icon: 'pi pi-id-card', route: `/dashboard/${id}/profile` },

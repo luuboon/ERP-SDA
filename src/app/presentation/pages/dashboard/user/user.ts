@@ -12,6 +12,7 @@ import { PermissionService } from '../../../../application/services/permission.s
 import { User as UserModel } from '../../../../core/models/user.model';
 import { PERMISSIONS } from '../../../../core/models/permission.model';
 import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
+import { AuthService } from '../../../../application/services/auth.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -112,10 +113,10 @@ export class User {
     this.permDialogVisible.set(true);
   }
 
-  savePermissions(): void {
+  async savePermissions(): Promise<void> {
     const user = this.editingPermUser();
     if (!user) return;
-    this.userService.update(user.id, { globalPermissions: [...this.editingPermissions()] });
+    await this.userService.update(user.id, { globalPermissions: [...this.editingPermissions()] });
     // Refrezcar todo el estado al cambiar mis propios permisos
     const currentWait = this.authService.currentUser();
     if (currentWait?.id === user.id) {

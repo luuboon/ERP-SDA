@@ -8,7 +8,7 @@
             <h2 class="profile-name">{{ user.name }}</h2>
             <p class="profile-email">{{ user.email }}</p>
             <div class="profile-roles mt-2">
-                @for (perm of user.permissions; track perm) {
+                @for (perm of user.globalPermissions; track perm) {
                 <p-tag [value]="perm" severity="info" styleClass="mr-1"></p-tag>
                 }
             </div>

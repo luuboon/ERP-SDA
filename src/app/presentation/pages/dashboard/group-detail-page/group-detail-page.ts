@@ -102,12 +102,12 @@ export class GroupDetailPage implements OnInit {
         this.router.navigate(['..'], { relativeTo: this.route });
     }
 
-    addMember(): void {
+    async addMember(): Promise<void> {
         const g = this.group();
         const userId = this.selectedUserId();
         if (!g || !userId) return;
 
-        const success = this.groupService.addMember(g.id, userId);
+        const success = await this.groupService.addMember(g.id, userId);
         if (success) {
             const userName = this.userService.getById(userId)?.name ?? userId;
             this.messageService.add({ severity: 'success', summary: 'Miembro añadido', detail: `"${userName}" fue agregado al grupo` });
