@@ -12,35 +12,39 @@ export class HttpTicketRepository extends TicketRepository {
   private base = `${environment.apiUrl}/api/tickets`;
 
   async getTickets(): Promise<Ticket[]> {
-    const res = await firstValueFrom(this.http.get<ApiResponse<Ticket>>(this.base));
-    return res.data;
+    const res = await firstValueFrom(this.http.get<ApiResponse<any>>(this.base));
+    return res.data.map(t => this.parseTicket(t));
   }
 
   async getById(id: string): Promise<Ticket | undefined> {
     try {
-      const res = await firstValueFrom(this.http.get<ApiResponse<Ticket>>(`${this.base}/${id}`));
-      return res.data[0];
+      const res = await firstValueFrom(this.http.get<ApiResponse<any>>(`${this.base}/${id}`));
+      return this.parseTicket(res.data[0]);
     } catch { return undefined; }
   }
 
   async getByGroup(groupId: string): Promise<Ticket[]> {
     const res = await firstValueFrom(
-      this.http.get<ApiResponse<Ticket>>(`${this.base}?groupId=${groupId}`)
+      this.http.get<ApiResponse<any>>(`${this.base}?groupId=${groupId}`)
     );
-    return res.data;
+    return res.data.map(t => this.parseTicket(t));
   }
 
   async create(data: Omit<Ticket, 'id' | 'createdAt' | 'comments' | 'history'>): Promise<Ticket> {
-    const res = await firstValueFrom(this.http.post<ApiResponse<Ticket>>(this.base, data));
-    return res.data[0];
+    const res = await firstValueFrom(this.http.post<ApiResponse<any>>(this.base, data));
+    return this.parseTicket(res.data[0]);
   }
 
-  async update(id: string, changes: Partial<Omit<Ticket, 'id' | 'createdAt' | 'comments' | 'history'>>, _changedBy: string): Promise<Ticket | undefined> {
+  async update(
+    id: string, 
+    changes: Partial<Omit<Ticket, 'id' | 'createdAt' | 'comments' | 'history'>>, 
+    _changedBy: string
+  ): Promise<Ticket | undefined> {
     try {
       const res = await firstValueFrom(
-        this.http.patch<ApiResponse<Ticket>>(`${this.base}/${id}`, changes)
+        this.http.patch<ApiResponse<any>>(`${this.base}/${id}`, changes)
       );
-      return res.data[0];
+      return this.parseTicket(res.data[0]);
     } catch { return undefined; }
   }
 
@@ -54,9 +58,25 @@ export class HttpTicketRepository extends TicketRepository {
   async addComment(ticketId: string, _author: string, content: string): Promise<Ticket | undefined> {
     try {
       const res = await firstValueFrom(
-        this.http.post<ApiResponse<Ticket>>(`${this.base}/${ticketId}/comments`, { content })
+        this.http.post<ApiResponse<any>>(`${this.base}/${ticketId}/comments`, { content })
       );
-      return res.data[0];
+      return this.parseTicket(res.data[0]);
     } catch { return undefined; }
+  }
+
+  private parseTicket(t: any): Ticket {
+    return {
+      ...t,
+      createdAt: new Date(t.createdAt),
+      dueDate:   t.dueDate ? new Date(t.dueDate) : new Date(),
+      comments:  (t.comments ?? []).map((c: any) => ({
+        ...c,
+        date: new Date(c.date),
+      })),
+      history: (t.history ?? []).map((h: any) => ({
+        ...h,
+        date: new Date(h.date),
+      })),
+    };
   }
 }
