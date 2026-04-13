@@ -1,5 +1,5 @@
 import {
-  Directive, Input, OnInit, OnDestroy,
+  Directive, Input, OnDestroy,
   TemplateRef, ViewContainerRef, inject, effect
 } from '@angular/core';
 import { PermissionService } from '../../application/services/permission.service';
@@ -8,7 +8,7 @@ import { PermissionService } from '../../application/services/permission.service
   selector: '[appHasPermission]',
   standalone: true,
 })
-export class HasPermissionDirective implements OnInit {
+export class HasPermissionDirective {
   private templateRef     = inject(TemplateRef<unknown>);
   private viewContainer   = inject(ViewContainerRef);
   private permissionSvc   = inject(PermissionService);
@@ -22,7 +22,7 @@ export class HasPermissionDirective implements OnInit {
     this.updateView();
   }
 
-  ngOnInit(): void {
+  constructor() {
     // Reaccionar reactivamente cuando cambien los permisos efectivos
     // (cuando el usuario cambia de grupo)
     effect(() => {

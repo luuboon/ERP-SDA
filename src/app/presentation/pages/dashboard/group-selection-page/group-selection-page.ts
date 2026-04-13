@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { PermissionService } from '../../../../application/services/permission.service';
 
 @Component({
     selector: 'app-group-selection-page',
@@ -24,6 +25,7 @@ export class GroupSelectionPage {
     private authService = inject(AuthService);
     private userService = inject(UserService);
     private ticketService = inject(TicketService);
+    private permissionService = inject(PermissionService);
     private router = inject(Router);
 
     readonly userGroups = computed(() => {
@@ -31,7 +33,7 @@ export class GroupSelectionPage {
         if (!user) return [];
 
         // Admins can see all groups
-        if (this.authService.hasPermission(PERMISSIONS.USER_MANAGE_PERMISSIONS)) {
+        if (this.permissionService.hasPermission(PERMISSIONS.USERS_MANAGE)) {
             return this.groupService.groups();
         }
 
