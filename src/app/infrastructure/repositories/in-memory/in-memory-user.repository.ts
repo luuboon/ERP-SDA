@@ -37,4 +37,16 @@ export class InMemoryUserRepository implements UserRepository {
         MockDB.users = MockDB.users.filter(x => x.id !== id);
         return Promise.resolve(MockDB.users.length !== initialLen);
     }
+
+    async setGroupPermissions(userId: string, groupId: string, permissions: string[]): Promise<void> {
+        const idx = MockDB.users.findIndex(x => x.id === userId);
+        if (idx === -1) return Promise.resolve();
+        
+        const user = MockDB.users[idx];
+        const newPermissionsByGroup = { ...(user.permissionsByGroup ?? {}) };
+        newPermissionsByGroup[groupId] = permissions;
+        
+        MockDB.users[idx] = { ...user, permissionsByGroup: newPermissionsByGroup };
+        return Promise.resolve();
+    }
 }
