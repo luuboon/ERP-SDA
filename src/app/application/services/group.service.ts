@@ -44,10 +44,9 @@ export class GroupService {
     }
 
     async addMember(groupId: string, userId: string): Promise<boolean> {
-        const group = this.getById(groupId);
-        if (!group || group.memberIds.includes(userId)) return false;
-        await this.update(groupId, { memberIds: [...group.memberIds, userId] });
-        return true;
+        const success = await this.repository.addMember(groupId, userId);
+        if (success) await this.loadGroups();
+        return success;
     }
 
     async addMemberByEmail(groupId: string, email: string): Promise<boolean> {
@@ -57,9 +56,8 @@ export class GroupService {
     }
 
     async removeMember(groupId: string, userId: string): Promise<void> {
-        const group = this.getById(groupId);
-        if (!group) return;
-        await this.update(groupId, { memberIds: group.memberIds.filter(id => id !== userId) });
+        await this.repository.removeMember(groupId, userId);
+        await this.loadGroups();
     }
 
     async updateTicketCount(groupId: string, count: number): Promise<void> {

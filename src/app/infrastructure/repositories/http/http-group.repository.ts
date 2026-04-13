@@ -43,4 +43,21 @@ export class HttpGroupRepository extends GroupRepository {
       return true;
     } catch { return false; }
   }
+
+  async addMember(groupId: string, userId: string): Promise<boolean> {
+    try {
+      await firstValueFrom(
+        this.http.post(`${this.base}/${groupId}/members`, { userId })
+      );
+      return true;
+    } catch { return false; }
+  }
+
+  async removeMember(groupId: string, userId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.delete(`${this.base}/${groupId}/members/${userId}`)
+      );
+    } catch {}
+  }
 }

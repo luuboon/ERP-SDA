@@ -37,4 +37,17 @@ export class InMemoryGroupRepository implements GroupRepository {
         MockDB.groups = MockDB.groups.filter(x => x.id !== id);
         return Promise.resolve(MockDB.groups.length !== initialLen);
     }
+
+    async addMember(groupId: string, userId: string): Promise<boolean> {
+        const group = MockDB.groups.find(g => g.id === groupId);
+        if (!group || group.memberIds.includes(userId)) return false;
+        group.memberIds.push(userId);
+        return true;
+    }
+
+    async removeMember(groupId: string, userId: string): Promise<void> {
+        const group = MockDB.groups.find(g => g.id === groupId);
+        if (!group) return;
+        group.memberIds = group.memberIds.filter(id => id !== userId);
+    }
 }

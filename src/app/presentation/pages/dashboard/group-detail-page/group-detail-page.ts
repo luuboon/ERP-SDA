@@ -91,11 +91,10 @@ export class GroupDetailPage implements OnInit {
         }
     }
 
-    private refreshGroup(id: string): void {
+    private async refreshGroup(id: string): Promise<void> {
+        await this.groupService.loadGroups();
         const g = this.groupService.getById(id);
-        if (g) {
-            this.group.set({ ...g });
-        }
+        if (g) this.group.set({ ...g });
     }
 
     goBack(): void {
@@ -112,7 +111,7 @@ export class GroupDetailPage implements OnInit {
             const userName = this.userService.getById(userId)?.name ?? userId;
             this.messageService.add({ severity: 'success', summary: 'Miembro añadido', detail: `"${userName}" fue agregado al grupo` });
             this.selectedUserId.set(null);
-            this.refreshGroup(g.id);
+            await this.refreshGroup(g.id);
         } else {
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo agregar el miembro' });
         }
@@ -129,10 +128,10 @@ export class GroupDetailPage implements OnInit {
             acceptLabel: 'Eliminar',
             rejectLabel: 'Cancelar',
             acceptButtonStyleClass: 'p-button-danger',
-            accept: () => {
-                this.groupService.removeMember(g.id, userId);
+            accept: async () => {
+                await this.groupService.removeMember(g.id, userId);
                 this.messageService.add({ severity: 'warn', summary: 'Miembro eliminado', detail: `"${userName}" fue eliminado del grupo` });
-                this.refreshGroup(g.id);
+                await this.refreshGroup(g.id);
             },
         });
     }
