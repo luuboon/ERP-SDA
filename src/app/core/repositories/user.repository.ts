@@ -7,4 +7,5 @@ export abstract class UserRepository {
     abstract create(data: Omit<User, 'id'>): Promise<User>;
     abstract update(id: string, changes: Partial<Omit<User, 'id'>>): Promise<User | undefined>;
     abstract delete(id: string): Promise<boolean>;
+    abstract setGroupPermissions(userId: string, groupId: string, permissions: string[]): Promise<void>;
 }

@@ -47,6 +47,11 @@ export class UserService {
         }
     }
 
+    async setGroupPermissions(userId: string, groupId: string, permissions: string[]): Promise<void> {
+        await this.repository.setGroupPermissions(userId, groupId, permissions);
+        await this.loadUsers();
+    }
+
     async grantAllPermissions(userId: string): Promise<void> {
         await this.update(userId, { globalPermissions: Object.values(PERMISSIONS) });
     }

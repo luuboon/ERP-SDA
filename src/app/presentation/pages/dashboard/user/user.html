@@ -130,8 +130,15 @@
     [style]="{ width: '520px' }" [breakpoints]="{ '640px': '95vw' }" [closeOnEscape]="true">
 
     <div class="perm-dialog-body">
-        <p class="perm-hint">Selecciona los permisos para este usuario:</p>
+        <!-- Selector de grupo -->
+        <div class="field" style="margin-bottom: 1rem;">
+            <p-select [options]="groupOptions()" optionLabel="label" optionValue="value"
+                [ngModel]="editingPermGroupId()" (ngModelChange)="onPermGroupChange($event)"
+                placeholder="Seleccionar grupo" appendTo="body" styleClass="w-full" />
+        </div>
 
+        @if (editingPermGroupId()) {
+        <p class="perm-hint">Permisos de este usuario en el grupo seleccionado:</p>
         <div class="perm-grid">
             @for (perm of allPermissions; track perm) {
             <div class="perm-item" (click)="togglePermission(perm)">
@@ -141,6 +148,11 @@
             </div>
             }
         </div>
+        } @else {
+        <p class="perm-hint" style="color: var(--text-color-secondary);">
+            Selecciona un grupo para ver y editar sus permisos.
+        </p>
+        }
     </div>
 
     <ng-template #footer>

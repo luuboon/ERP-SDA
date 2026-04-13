@@ -76,6 +76,7 @@ export class User {
   editingId = signal<string | null>(null);
   editingPermissions = signal<string[]>([]);
   editingPermUser = signal<UserModel | null>(null);
+  editingPermGroupId = signal<string>('');
 
   userForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -109,20 +110,40 @@ export class User {
 
   openPermissions(user: UserModel): void {
     this.editingPermUser.set(user);
-    this.editingPermissions.set([...(user.globalPermissions || [])]);
+    // Seleccionar el primer grupo del usuario por defecto
+    const firstGroup = Object.keys(user.permissionsByGroup ?? {})[0] ?? '';
+    this.editingPermGroupId.set(firstGroup);
+    this.editingPermissions.set([...(user.permissionsByGroup?.[firstGroup] ?? [])]);
     this.permDialogVisible.set(true);
+  }
+
+  onPermGroupChange(groupId: string): void {
+    this.editingPermGroupId.set(groupId);
+    const user = this.editingPermUser();
+    this.editingPermissions.set([...(user?.permissionsByGroup?.[groupId] ?? [])]);
   }
 
   async savePermissions(): Promise<void> {
     const user = this.editingPermUser();
-    if (!user) return;
-    await this.userService.update(user.id, { globalPermissions: [...this.editingPermissions()] });
-    // Refrezcar todo el estado al cambiar mis propios permisos
-    const currentWait = this.authService.currentUser();
-    if (currentWait?.id === user.id) {
-        this.authService.logout(); // Si me quito permisos a mi mismo se debe desloguear (por seguridad). Reforzar despues con backend
+    const groupId = this.editingPermGroupId();
+    if (!user || !groupId) return;
+
+    await this.userService.setGroupPermissions(
+      user.id,
+      groupId,
+      [...this.editingPermissions()]
+    );
+
+    const currentUser = this.authService.currentUser();
+    if (currentUser?.id === user.id) {
+      this.authService.logout();
     }
-    this.messageService.add({ severity: 'success', summary: 'Permisos actualizados', detail: `Permisos globales de "${user.name}" fueron actualizados` });
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Permisos actualizados',
+      detail: `Permisos de "${user.name}" en este grupo actualizados`
+    });
     this.permDialogVisible.set(false);
   }
 

@@ -48,4 +48,10 @@ export class HttpUserRepository extends UserRepository {
       return true;
     } catch { return false; }
   }
+
+  async setGroupPermissions(userId: string, groupId: string, permissions: string[]): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.base}/${userId}/permissions`, { groupId, permissions })
+    );
+  }
 }
